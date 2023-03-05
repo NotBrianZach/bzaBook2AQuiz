@@ -1,0 +1,25 @@
+{
+  "name": "gptbook2quiz",
+  "version": "1.0.0",
+  "description": "step 1: install nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NotBrianZach/gptbook2quiz.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NotBrianZach/gptbook2quiz/issues"
+  },
+  "homepage": "https://github.com/NotBrianZach/gptbook2quiz#readme",
+  "dependencies": {
+    "commander": "^10.0.0",
+    "openai": "^3.2.1",
+    "pdf-extract": "^1.0.11",
+    "prompt": "^1.3.0"
+  }
+}

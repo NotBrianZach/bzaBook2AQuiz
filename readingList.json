@@ -1,0 +1,19 @@
+{
+  "mode": "quiz&answer",
+  "modeValues": ["quiz&answer", "quiz", "query", "narrate"],
+  "exampleCharacterValues": ["","socrates", "lao-tzu", "mike tyson"],
+  "readingList": {
+    "frankenstein": {
+      "pageNumber": 0,
+      "chunkSize": 2,
+      "character": "",
+      "mode": "quiz&answer",
+      "pdfPath": "./Frankenstein.pdf",
+      "max_tokens": 2000,
+      "executable": "xpdf",
+      "arguments": "-z 200",
+      "prependContext": "",
+      "appendContext": ""
+    }
+  }
+}
