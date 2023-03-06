@@ -23,7 +23,7 @@
 **** 1-a -> step 1 happens concurrently/asynchronously to step a
 
 ** Event Loop: Giving Gpt3 Short&Long Term Memory 
-*** 1. IF readingList.json EXISTS, load title&synopsis&rollingSummary from there
+*** 1.IF readingList.json has an entry for bookName, load title&synopsis&rollingSummary from there
 *** ELSE try to grab title w/gpt3 from first chunkSize pages, query user to validate 
 **** C=confirm gpt3 grabbed a valid title, 
 **** any other input is assumed to be the title,
@@ -31,7 +31,7 @@
 **** if input matches regex ([0-9]*-[0-9]*), grab table of contents from that page range, synopsize with gpt3 and validate with user
 **** else ask user input synopsis, confirm they entered it correctly 
 *** finally set rollingSummary=empty string
-*** 2. IF readingList.json EXISTS, load pageNumber&chunkSize from there, ELSE set pageNumber=commandline param (default 0)&chunkSize=commandline param (default 2)
+*** 2. IF readingList.json has an entry for bookName, load pageNumber&chunkSize from there, ELSE set pageNumber&chunkSize from commandline parameters or defaults (0,2)
 *** 3. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending beforeContext&synopsis&title&rollingSummary, appending afterContext, summarize pages[pageNumber:pageNumber+chunkSize]
 *** 4. query gpt3 w/synopsis+summary of pages[pageNumber:pageNumber+chunkSize] to generate a new rollingSummary
 *** 5. while pageNumber < bookLength, set pageNumber=pageNumber+chunkSize, jump back to 3. else continue to 6.
