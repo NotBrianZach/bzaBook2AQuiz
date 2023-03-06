@@ -13,13 +13,12 @@ const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY)
 
 program
   .version("0.1.0")
-  .option("-f, --file <file>", "Path to PDF file")
+  .option("-f, --file <file>", "Path to file to read from")
   .option("-p, --page <page>", "current page number")
+  .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
   .option("-I, --isPDFImage <isPDFImage>", "if pdf is a scanned image w/no searchable text")
-  .option("-p, --page <page>", "current page number")
   .option("-b, --before <beforeContext>", "context provided to gpt at beginning of each request")
   .option("-a, --after <afterContext>", "context provide to llm at end of each request")
-  .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
   .option("-C, --character <character>", "character to reply as")
 //TODO .option("-t, --type <type>", "pdf, html")
   .parse(process.argv);

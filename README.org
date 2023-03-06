@@ -23,19 +23,26 @@
 **** 1-a -> step 1 happens concurrently/asynchronously to step a
 
 ** Event Loop: Giving Gpt3 Short&Long Term Memory 
-*** 1. IF EXISTS, load title&synopsis&rollingSummary from readingList.json ELSE try to grab title, query user C=confirm, string=user inputs title, query user for page range of table of contents if input=([0-9]*-[0-9]*) try to synopsize and validate with user, else ask user input synopsis, rollingSummary=empty string
-*** 2. IF EXISTS, load pageNumber, chunkSize from reagingList.json, ELSE pageNumber=commandline param (default 0), chunkSize=commandline param  (default 2)
+*** 1. IF readingList.json EXISTS, load title&synopsis&rollingSummary from there
+**** ELSE try to grab title w/gpt3 from first chunkSize pages, query user to validate 
+***** C=confirm gpt3 grabbed a valid title, 
+***** any other input is assumed to be the title,
+**** then query user for page range of table of contents 
+***** if input= matches regex ([0-9]*-[0-9]*) grab table of contents from that page range synopsize and validate with user
+***** else ask user input synopsis, confirm they entered it correctly 
+**** finally set rollingSummary=empty string
+*** 2. IF readingList.json EXISTS, load pageNumber&chunkSize from there, ELSE set pageNumber=commandline param (default 0)&chunkSize=commandline param (default 2)
 *** 3. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending beforeContext&synopsis&title&rollingSummary, appending afterContext, summarize pages[pageNumber:pageNumber+chunkSize]
 *** 4. query gpt3 w/synopsis+summary of pages[pageNumber:pageNumber+chunkSize] to generate a new rollingSummary
-*** 5. while pageNumber < bookLength, set pageNumber=pageNumber+chunkSize, go back to 3. else continue to 6.
-*** 6. call onExit method (cleanup, parting thoughts)
+*** 5. while pageNumber < bookLength, set pageNumber=pageNumber+chunkSize, jump back to 3. else continue to 6.
+*** 6. call onExit method (parting thoughts from gpt3, cleanup)
 
-** Quiz Mode: Start with book pdf, then
+** Quiz Mode: 
 **** 1.a. generate quiz,
 **** 2.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
 **** 6.a record a log of all the summaries and quizzes
 
-** Quiz&Answer Mode: Start with book pdf, then
+** Quiz&Answer Mode:
 **** 1.a. generate quiz,
 **** 2.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
 **** 2.b. gpt attempts to answer the quiz prints answers,
@@ -59,11 +66,11 @@
 **** 1.a ask user for character (e.g. socrates) (any string will be accepted)
 **** 2.a read pages, rewrite in characters voice
 
-** Narrate Submode: 
-*** todo use ? https://github.com/coqui-ai/TTS ? to generate voice to narrate gpt response&queries to user
+** Narration Input Toggle: 
+*** todo optionally use ? https://github.com/coqui-ai/TTS ? to generate voice to narrate gpt response&queries to user
 
-** VoiceDiction Submode: 
-*** todo use ?talon? to allow voice input?
+** VoiceDiction Output Toggle: 
+*** todo optionally use ?talon? to allow voice input?
 
 * Reading List Utility (bza.sh)
 
@@ -86,7 +93,7 @@ from the command line (and have the option to pass in e.g. the current pagenumbe
 
 bza are my initials.
 
-also naive/correct pronounciation sounds kind of like pizza, which is typically
+also the naive/correct pronounciation sounds like pizza, which is typically
 sliced into pieces just like we are chunking up books. Book pizza.
 
 and bza is a short three letter word which is not too overloaded and can be invoked easily on the command line.
@@ -154,4 +161,4 @@ i think there is a similar analogy going on here.
 reddit user SignificanceMassive3's diagram displays a "context free" or "pushdown" large language model (ignore the fact the diagram has two stacks and is ?probably? technically turing complete, we don't push to our long term context after we define it, well, mostly... Look buddy we are operationally a pushdown automata!)
 [[PushDownLLM.png]]
 
-which, much like a regular expression is suitable for parsing text, is suitable for the task of reading along with longer form text 
+which, much like a regular expression is suitable for matching patterns in text, a "push down llm" is suitable for the task of reading along with longer form text 
