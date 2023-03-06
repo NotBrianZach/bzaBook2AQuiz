@@ -31,7 +31,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 **** a.1 -> step a happens before step 1, but after step 0
 **** 1.a -> step 1 happens before step a
 **** 1.b -> step 1 happens before step a, step b happens after step a
-**** 1-a -> step 1 happens concurrently/asynchronously with step a
+**** (currently unused) 1-a -> step 1 happens concurrently/asynchronously with step a 
 
 ** Event Loop: Giving Gpt3 Short&Long Term Memory 
 *** 1.IF readingList.json has an entry for bookName, load title&synopsis&rollingSummary from there
