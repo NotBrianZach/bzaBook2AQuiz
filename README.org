@@ -5,15 +5,15 @@
 ****  - TODO gifs or youtube playlist here
 ****  - if windows then install windows subsystem for linux 
 ****  - https://nixos.org/download.html (select appropriate operating system from siderbar)
+****  - https://git-scm.com/book/en/v2/Getting-Started-Installing-Git 
 ****  - git clone https://github.com/NotBrianZach/bzabook2aquiz.git
 ****  - cd bzabook2aquiz
 ****  - nix-shell (flake is work in progress) todo check if mac and use darwin nixpkgs
-****  - make a pull request implementing pretty much all the features this project currently needs to be a nice user experience
 ****  - npm install
+****  - get $OPENAI_API_KEY key here if u dont have https://platform.openai.com/account/api-keys
 ****  - OPENAI_API_KEY=$OPENAI_API_KEY ./bza.mjs -f path_2_ur_pdf_here.pdf
-****  - get $OPEN_API_KEY key here if u dont have https://platform.openai.com/account/api-keys
 ****  - open an issue detailing why doesnt work
-****  - ELITE HACKER: possibly move readingList.json into another directory under source control or cloud backup and create a symlink here pointing to it
+****  - ELITE HACKER: possibly move readingList.json && logs directory into another directory under source control or cloud backup and create a symlink(s) here pointing to it/them
 
 ** How to read Event Loop&Workflows
 **** numbers are steps in the event loop, letters are steps in a given workflow (which modifies event loop)
@@ -33,7 +33,7 @@
 *** finally set rollingSummary=empty string
 *** 2. IF readingList.json has an entry for bookName, load pageNumber&chunkSize from there, 
 *** ELSE set pageNumber&chunkSize from commandline parameters or defaults (0,2)
-*** 3. DO pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext) 
+*** 3. DO pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext) print
 *** 4. rollingSummary=queryGPT3(synopsis+summary) 
 *** 5. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 3. else continue to 6.
 *** 6. call onExit method (cleanup)
@@ -63,13 +63,13 @@
 *******  "\ntell another joke about the above text that ties into the first joke" 
 **** 6.a parting thoughts from gpt3, record a log of all questions&answers
 
-** Rewrite Workflow: 
-**** 1.a ask user for character (e.g. socrates) (any string will be accepted)
-**** 2.a read pages, rewrite in characters voice
-
 ** Optional Toggles (TODO): 
+*** Summary Printing: whether or not to print summaries of pageChunks&the rollingSummary
 *** Narration: use ? https://github.com/coqui-ai/TTS ? to generate voice to narrate gpt response&queries to user
 *** Voice Dictation: use ?talon? to allow voice input?
+*** Narration toggle: rewrite all output in the voice of a character
+*** Narrate Title&Summary toggle: 1.a also rewrite the title&summary in character voice prior to all other queries (after user has confirmed them)
+*** Narrate Pages toggle: a.3 also rewrite the page chunks in character voice prior to all other queries
 
 * Reading List Utility (bzaUtil.sh)
 
