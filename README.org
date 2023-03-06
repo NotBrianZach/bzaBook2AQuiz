@@ -105,7 +105,7 @@ makes total sense.
 
 * Inspiration
 
-i had previously kept a reading list with commands like
+i have kept, for a couple years, a reading list with commands like
 
 """
 
@@ -121,11 +121,11 @@ xpdf ~/media/books/LinuxProgrammingInterface2010.pdf
 
 in a file in my /home/$user/media directory so i could read books from command line and record current position
 
-i had also been looking for technically inclined book club without luck(well i didnt try super hard) 
+i had also been looking for technically inclined book club without luck (well i didnt try super hard) 
 
-thought had been bubbling in my head that I wanted to read books alongside gpt3,
+a thought had been bubbling in my head that I wanted to read books alongside gpt3,
 
-i had previously spent several years trying to make multi player choose your own adventure novels a thing (and maybe still plan to?)
+i had previously spent quite some time trying to make multi player choose your own adventure novels a thing (and maybe still plan to?)
 
 i really thought, and think, as a massive wordcel, that computers have a vast potential to create new narrative structures
 
@@ -139,9 +139,9 @@ and a within a couple minutes, after some good ole reddit arguing, i started wri
 
 a final thought, about fundamental models of computation
 
-the taxonomy of computation looks like this
+the theoretical taxonomy of computation looks like this
 
-finite state machines -> context free grammars -> turing machines
+finite state machines -> have subset of functionality of -> context free grammars -> have subset of functionality of -> turing machines
 
 traditional narratives are simple finite state machines at the level of pages
 
