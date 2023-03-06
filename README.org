@@ -1,4 +1,15 @@
 * A GPT-Powered Conversational Read Eval Print Loop for Books&Articles
+Interactive books.
+
+It takes a pdf, or in the future maybe webpages or epubs, and feeds it a few pages at a time into
+a large language model, outputs something, for example, in one mode or workflow, a quiz on the topic of the pages it read
+and then waits for some form of user input to tell it to, for example, continue on or record the quiz results
+
+Thus it could potentially provide a way to read more actively. (and, for instance, by logging the quiz onto the file system
+could potentially facilitate spaced repetition of read content).
+
+Could also be thought of as a reading buddy or a narrator. 
+
 **TODO gif or youtube example
 
 * To Run
@@ -70,6 +81,9 @@
 *** Narration toggle: rewrite all output in the voice of a character
 *** Narrate Title&Summary toggle: 1.a also rewrite the title&summary in character voice prior to all other queries (after user has confirmed them)
 *** Narrate Pages toggle: a.3 also rewrite the page chunks in character voice prior to all other queries
+
+** Options&Defaults (readingList.json): 
+*** Article Type: [book, paper, news]
 
 * Reading List Utility (bzaUtil.sh)
 
