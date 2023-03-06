@@ -90,10 +90,10 @@ from the command line (and have the option to pass in e.g. the current pagenumbe
 
 * Naming
 
-bza are my initials.
-
-also the naive/correct pronounciation sounds like pizza, which is typically
+the naive/correct pronounciation sounds like pizza, which is typically
 sliced into pieces just like we are chunking up books. Book pizza.
+
+bza is also my initials. #branding
 
 and bza is a short three letter word which is not too overloaded and can be invoked easily on the command line.
 
@@ -101,7 +101,7 @@ finally, book starts with B, quiz ends with Z and A is A. so it's like an anagra
 
 makes total sense.
 
-just bza it! [[bzatime.jpg]]
+[[bzatime.jpg]]
 
 * Inspiration
 
