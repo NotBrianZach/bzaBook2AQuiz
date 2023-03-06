@@ -31,23 +31,24 @@
 **** if input matches regex ([0-9]*-[0-9]*), grab table of contents from that page range, synopsize with gpt3 and validate with user
 **** else ask user input synopsis, confirm they entered it correctly 
 *** finally set rollingSummary=empty string
-*** 2. IF readingList.json has an entry for bookName, load pageNumber&chunkSize from there, ELSE set pageNumber&chunkSize from commandline parameters or defaults (0,2)
-*** 3. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending beforeContext&synopsis&title&rollingSummary, appending afterContext, summarize pages[pageNumber:pageNumber+chunkSize]
-*** 4. query gpt3 w/synopsis+summary of pages[pageNumber:pageNumber+chunkSize] to generate a new rollingSummary
-*** 5. while pageNumber < bookLength, set pageNumber=pageNumber+chunkSize, jump back to 3. else continue to 6.
-*** 6. call onExit method (parting thoughts from gpt3, cleanup)
+*** 2. IF readingList.json has an entry for bookName, load pageNumber&chunkSize from there, 
+*** ELSE set pageNumber&chunkSize from commandline parameters or defaults (0,2)
+*** 3. DO pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext) 
+*** 4. rollingSummary=queryGPT3(synopsis+summary) 
+*** 5. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 3. else continue to 6.
+*** 6. call onExit method (cleanup)
 
 ** Quiz Workflow: 
 **** 1.a. generate quiz,
 **** 2.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
-**** 6.a record a log of all the summaries and quizzes
+**** 6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ** Quiz&Answer Workflow:
 **** 1.a. generate quiz,
 **** 2.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
 **** 2.b. gpt attempts to answer the quiz prints answers,
 ***** query user-> R for user reply to answers, on other input continue
-**** 6.a record a log of all the summaries and quizzes
+**** 6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ** Query Workflow: 
 **** 1.a query user for question, 
@@ -60,7 +61,7 @@
 *******  "tell a joke about the following text\n" 
 ****** B= prepend next query input to gpt query at the start of each chunk
 *******  "\ntell another joke about the above text that ties into the first joke" 
-**** 6.a record a log of all questions&answers
+**** 6.a parting thoughts from gpt3, record a log of all questions&answers
 
 ** Rewrite Workflow: 
 **** 1.a ask user for character (e.g. socrates) (any string will be accepted)
@@ -70,7 +71,7 @@
 *** Narration: use ? https://github.com/coqui-ai/TTS ? to generate voice to narrate gpt response&queries to user
 *** Voice Dictation: use ?talon? to allow voice input?
 
-* Reading List Utility (bza.sh)
+* Reading List Utility (bzaUtil.sh)
 
 store path to pdf and relevant executable to read it
 
