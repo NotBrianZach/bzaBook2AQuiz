@@ -15,7 +15,7 @@
 ****  - open an issue detailing why doesnt work
 ****  - ELITE HACKER: possibly move readingList.json into another directory under source control or cloud backup and create a symlink here pointing to it
 
-** How to read Event Loop&Modules
+** How to read Event Loop&Workflows
 **** numbers are steps in the event loop, letters are steps in a given workflow (which modifies event loop)
 **** a.1 -> step a happens before step 1, but after step 0
 **** 1.a -> step 1 happens before step a
@@ -37,19 +37,19 @@
 *** 5. while pageNumber < bookLength, set pageNumber=pageNumber+chunkSize, jump back to 3. else continue to 6.
 *** 6. call onExit method (parting thoughts from gpt3, cleanup)
 
-** Quiz Mode: 
+** Quiz Workflow: 
 **** 1.a. generate quiz,
 **** 2.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
 **** 6.a record a log of all the summaries and quizzes
 
-** Quiz&Answer Mode:
+** Quiz&Answer Workflow:
 **** 1.a. generate quiz,
 **** 2.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
 **** 2.b. gpt attempts to answer the quiz prints answers,
 ***** query user-> R for user reply to answers, on other input continue
 **** 6.a record a log of all the summaries and quizzes
 
-** Query Mode: 
+** Query Workflow: 
 **** 1.a query user for question, 
 **** 1.b gpt3 answer user query,  
 ***** query user
@@ -62,15 +62,13 @@
 *******  "\ntell another joke about the above text that ties into the first joke" 
 **** 6.a record a log of all questions&answers
 
-** Rewrite Mode: 
+** Rewrite Workflow: 
 **** 1.a ask user for character (e.g. socrates) (any string will be accepted)
 **** 2.a read pages, rewrite in characters voice
 
-** Narration Input Toggle: 
-*** todo optionally use ? https://github.com/coqui-ai/TTS ? to generate voice to narrate gpt response&queries to user
-
-** VoiceDiction Output Toggle: 
-*** todo optionally use ?talon? to allow voice input?
+** Optional Toggles (TODO): 
+*** Narration: use ? https://github.com/coqui-ai/TTS ? to generate voice to narrate gpt response&queries to user
+*** Voice Dictation: use ?talon? to allow voice input?
 
 * Reading List Utility (bza.sh)
 
@@ -102,7 +100,7 @@ finally, book starts with B, quiz ends with Z and A is A. so it's like an anagra
 
 makes total sense.
 
-just bza it!
+just bza it! [[bzatime.jpg]]
 
 * Inspiration
 
