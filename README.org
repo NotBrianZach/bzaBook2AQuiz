@@ -2,13 +2,13 @@
 Interactive books.
 
 It takes a pdf, or in the future maybe webpages or epubs, and feeds it a few pages at a time into
-a large language model, outputs something, for example, in one mode or workflow, a quiz on the topic of the pages it read
+a ai chatbot, then outputs something, for example, a quiz on the topic of the pages it read
 and then waits for some form of user input to tell it to, for example, continue on or record the quiz results
 
-Thus it could potentially provide a way to read more actively. (and, for instance, by logging the quiz onto the file system
-could potentially facilitate spaced repetition of read content).
+Thus it could potentially provide a way to read more actively. (and by logging the conversation onto the file system
+facilitate spaced repetition of read content).
 
-Could also be thought of as a reading buddy or a narrator. 
+Could also be thought of as a reading buddy, summarizer or a customizable narrator/reteller. 
 
 **TODO gif or youtube example
 
@@ -63,27 +63,30 @@ Could also be thought of as a reading buddy or a narrator.
 
 ** Query Workflow: 
 **** 1.a query user for question, 
-**** 1.b gpt3 answer user query,  
+**** 1.b gpt3 request answer user query,  
 ***** query user
 ****** C=continue to next page,
-****** Q=ask another question, repeat 1.b
-****** r=query gpt3 w/user reply on question answer,
-****** A= append next query input to gpt query at the start of each chunk
-*******  "tell a joke about the following text\n" 
-****** B= prepend next query input to gpt query at the start of each chunk
-*******  "\ntell another joke about the above text that ties into the first joke" 
+****** Q=ask a different query, repeat 1.b
+****** r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,
+****** B="before" prepend next user query input to all non summary gpt requests, repeat 1.b
+*******  "tell a joke about the following text:" 
+****** D=delete stack of prepended prompts
+****** A="after" append next user query input to all non summary gpt requests, repeat 1.b
+*******  "...tell another joke about the above text that ties into the first joke" 
+****** d=delete stack of appended prompts
 **** 6.a parting thoughts from gpt3, record a log of all questions&answers
 
 ** Optional Toggles (TODO): 
-*** Summary Printing: whether or not to print summaries of pageChunks&the rollingSummary
-*** Narration: use ? https://github.com/coqui-ai/TTS ? to generate voice to narrate gpt response&queries to user
-*** Voice Dictation: use ?talon? to allow voice input?
-*** Narration toggle: rewrite all output in the voice of a character
-*** Narrate Title&Summary toggle: 1.a also rewrite the title&summary in character voice prior to all other queries (after user has confirmed them)
-*** Narrate Pages toggle: a.3 also rewrite the page chunks in character voice prior to all other queries
+**** Summary Printing: whether or not to print summaries of pageChunks&the rollingSummary
+**** Narration: use ? https://github.com/coqui-ai/TTS ? to generate voice to narrate gpt response&queries to user
+**** Voice Dictation: use ?talon? to allow voice input?
+**** Narration toggle: rewrite all output in the voice of a character
+**** Narrate Title&Summary toggle: 1.a also rewrite the title&summary in character voice prior to all other queries (after user has confirmed them)
+**** Narrate Pages toggle: a.3 also rewrite the page chunks in character voice prior to all other queries
 
 ** Options&Defaults (readingList.json): 
-*** Article Type: [book, paper, news]
+**** Article format: [pdf, html, epub]
+**** Article Type: [book, research paper, news]
 
 * Reading List Utility (bzaUtil.sh)
 
