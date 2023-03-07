@@ -18,7 +18,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - `cd bzabook2aquiz`
 - `nix-shell` (flake is work in progress, cant promise this will work out of the box quite yet)
 - `npm install`
-- get $OPENAI_API_KEY key here if u dont have [Open AI](https://platform.openai.com/account/api-keys)
+- get $OPENAI_API_KEY key [here](https://platform.openai.com/account/api-keys) if u dont have 
 - `OPENAI_API_KEY=$OPENAI_API_KEY ./bza.mjs -f path_2_ur_pdf_here.pdf`
 - open an issue detailing why doesnt work
 - ELITE HACKER: possibly move readingList.json && logs directory into another directory under source control or cloud backup and create a symlink(s) here pointing to it/them
