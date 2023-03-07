@@ -12,11 +12,11 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 
 ## To Run
 - if windows then install windows subsystem for linux 
-- [nixos.org](https://nixos.org/download.html) (select appropriate operating system from siderbar)
-- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- install [nixos.org](https://nixos.org/download.html) (select appropriate operating system from siderbar)
+- install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - `git clone https://github.com/NotBrianZach/bzabook2aquiz.git`
 - `cd bzabook2aquiz`
-- `nix-shell` (flake is work in progress)
+- `nix-shell` (flake is work in progress, cant promise this will work out of the box quite yet)
 - `npm install`
 - get $OPENAI_API_KEY key here if u dont have [Open AI](https://platform.openai.com/account/api-keys)
 - `OPENAI_API_KEY=$OPENAI_API_KEY ./bza.mjs -f path_2_ur_pdf_here.pdf`
