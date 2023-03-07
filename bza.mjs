@@ -57,6 +57,16 @@ var pdfOptions = {
   clean: true // try prevent tmp directory /usr/run/$userId$ from overfilling with parsed pdf pages (doesn't seem to work)
 };
 
+const defaultUserQuery = {
+  properties: {
+    validTitle: {
+      message:
+      "Press C if title correct, otherwise enter title",
+      required: true
+    }
+  }
+}
+
 function removeExtraWhitespace(str) {
   // removes any instance of two or whitespace (text often has tons of padding characers), and whitespace from end and beginning of str
   return str.replace(/\s+/g, " ").trim();

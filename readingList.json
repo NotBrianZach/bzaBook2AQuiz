@@ -13,8 +13,8 @@
       "max_tokens": 2000,
       "executable": "xpdf",
       "arguments": "-z 200",
-      "prependContext": "",
-      "appendContext": ""
+      "prependContext": [""],
+      "appendContext": [""]
     }
   }
 }
