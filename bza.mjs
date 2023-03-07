@@ -14,6 +14,7 @@ const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY)
 program
   .version("0.1.0")
   .option("-f, --file <file>", "Path to file to read from")
+  .option("-O, --openAIAPIKey <openAIAPIKey>", "api key").env("openAIAPIKey")
   .option("-p, --page <page>", "current page number")
   .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
   .option("-I, --isPDFImage <isPDFImage>", "if pdf is a scanned image w/no searchable text")
@@ -25,7 +26,7 @@ program
 const options = program.opts();
 console.log(options);
 if (!options.file) {
-  console.error("No file specified e.g. ./google_sre_2_2018.pdf");
+  console.error("No file specified e.g. ./Frankenstein.pdf");
   process.exit(1);
 }
 let beforeContext = options.beforeContext

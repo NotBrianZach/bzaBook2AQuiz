@@ -39,14 +39,26 @@ then query user for page range of table of contents
 finally set rollingSummary=empty string
 2. IF readingList.json has an entry for bookName, load pageNumber & chunkSize from there, 
 ELSE set pageNumber & chunkSize from commandline parameters or defaults (0,2)
-3. DO pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext) print, input to continue
-4. rollingSummary=queryGPT3(synopsis+pageChunkSummary) print, input to continue
+3. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
+4. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
 5. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 3. else continue to 6.
 6. call onExit method (cleanup)
 
+## User Query defaults:
+- ask user for input
+  - C=continue to next page,
+  - Q=ask a different query, repeat 1.b
+  - r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,
+  - b="before" prepend next user query input to all non summary gpt requests, repeat 1.b
+    - "tell a joke about the following text:" 
+  - d=delete stack of prepended prompts
+  - A="after" append next user query input to all non summary gpt requests, repeat 1.b
+    - "...tell another joke about the above text that ties into the first joke" 
+  - D=delete stack of appended prompts
+
 ## Quiz Workflow: 
-1.a. generate quiz,
-2.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
+3.a. generate quiz from pageChunkSummary,
+3.b. quiz the user, record user answer to quiz
 6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ## Quiz & Answer Workflow:
@@ -57,8 +69,8 @@ ELSE set pageNumber & chunkSize from commandline parameters or defaults (0,2)
 6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ## Query Workflow: 
-1.a query user for question, 
-1.b gpt3 request answer user query,  
+3.a query user for question, 
+3.b gpt3 request answer user query,  
   - query user
     - C=continue to next page,
     - Q=ask a different query, repeat 1.b
