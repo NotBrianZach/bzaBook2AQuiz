@@ -1,4 +1,4 @@
-# BZA: A GPT-Powered Conversational Read Eval Print Loop for Books & Articles
+# BZA: A GPT-Powered Conversational Read Eval Print Loop for Books & Articles (WIP)
 
 Interactive books. Books sliced up like pizza. Book pizza. Bza.
 
