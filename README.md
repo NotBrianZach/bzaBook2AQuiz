@@ -59,16 +59,17 @@ ELSE set pageNumber & chunkSize from commandline parameters or defaults (0,2)
   - D=delete stack of appended prompts
 
 ## Quiz Workflow: 
-3.a. generate quiz from pageChunkSummary,
-3.b. quiz the user, record user answer to quiz
-6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
+- 3.a. generate quiz from pageChunkSummary,
+- 3.b. quiz the user, record user answer to quiz
+- 6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ## Quiz & Answer Workflow:
-1.a. generate quiz,
-2.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
-2.b. gpt attempts to answer the quiz prints answers,
-  - query user-> R for user reply to answers, on other input continue
-6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
+- 3.a. generate quiz,
+- 3.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
+- 4.b. gpt attempts to answer the quiz prints answers,
+  - query user-> 
+    - R for user reply to answers, on other input continue
+- 6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ## Query Workflow: 
 3.a query user for question, 

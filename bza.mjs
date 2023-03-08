@@ -17,6 +17,7 @@ program
   .option("-O, --openAIAPIKey <openAIAPIKey>", "api key").env("openAIAPIKey")
   .option("-p, --page <page>", "current page number")
   .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
+  .option("-w, --workflow <workflow>", "type of workflow")
   .option("-I, --isPDFImage <isPDFImage>", "if pdf is a scanned image w/no searchable text")
   .option("-b, --before <beforeContext>", "context provided to gpt at beginning of each request")
   .option("-a, --after <afterContext>", "context provide to llm at end of each request")
@@ -57,12 +58,24 @@ var pdfOptions = {
   clean: true // try prevent tmp directory /usr/run/$userId$ from overfilling with parsed pdf pages (doesn't seem to work)
 };
 
-const defaultUserQuery = {
-  properties: {
-    validTitle: {
-      message:
-      "Press C if title correct, otherwise enter title",
-      required: true
+
+//   - ask user for input
+function modifyDefaultUserQuery(optionToAdd, isPrepend) {
+  const defaultUserQuery = {
+    properties: {
+      nextAction: {
+        type: 'string',                 // Specify the type of input to expect.
+        description:
+        `${isPrepend && optionToAdd}\n
+         C=continue to next page,\n
+         Q=ask a different query \n
+         r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
+         b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
+         d=delete stack of prepended prompts
+         A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
+         D=delete stack of appended prompts${!isPrepend && optionToAdd}
+`
+      }
     }
   }
 }
@@ -84,7 +97,7 @@ let logQuiz = [];
 const existsBookNameInReadingList = typeof readingList
 const currentPageNumber = options.page === undefined ? 0 : options.page;
 const chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize;
-function eventLoop(data, 1a, 2a, 2b, 6a) {
+function eventLoop(data, 3a, 3a, 3b, 6a) {
   const totalPages = data.text_pages.length;
   console.log("totalPages", totalPages, currentPageNumber, chunkSize);
   // 1. IF EXISTS, load title&synopsis&rollingSummary from readingList.json ELSE try to grab title, query user C=confirm, string=user inputs title, query user for page range of table of contents if input=([0-9]*-[0-9]*) try to synopsize and validate with user, else ask user input synopsis, rollingSummary=empty string
@@ -100,7 +113,7 @@ function eventLoop(data, 1a, 2a, 2b, 6a) {
     properties: {
       validTitle: {
         message:
-        "Press C if title correct, otherwise enter title",
+        "Press Y if title correct, otherwise enter title",
         required: true
       }
     }
@@ -114,8 +127,8 @@ function eventLoop(data, 1a, 2a, 2b, 6a) {
         .slice(currentPageNumber, currentPageNumber + chunkSize)
         .join("")
     );
-    rollingSummary = queryGPT(`Given SYNOPSIS, TITLE, and ROLLING SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, SYNOPSIS: ${synopsis}, ROLLING SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
-    //2. display summary of pages[pageNum:pageNum+chunkSize] and quiz  to the user, record user answer to quiz
+    rollingSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
+    //2. display summary of pages[pageNum:pageNum+chunkSize] and quiz to the user, record user answer to quiz
     console.log(
       `Summary of pages ${currentPageNumber} to ${currentPageNumber +
         chunkSize}:`,
@@ -124,7 +137,7 @@ function eventLoop(data, 1a, 2a, 2b, 6a) {
     logSummary.push(rollingSummary);
     await prompt.get(["Press any a letter+enter to continue to quiz"]);
 
-    // **** 1.a. generate quiz,
+    // * 1.a. generate quiz,
     const quiz =  queryGPT(`$SUMMARY$: ${synopsis} $CONTENT$: ${pageSlice} $INSTRUCTIONS$: given $SUMMARY$ and $CONTENT$ of book titled "${title}" generate a quiz bank of questions to test knowledge of $CONTENT$`)
     console.log(`Quiz:`, quiz);
     logQuiz.push(quiz);
@@ -169,7 +182,18 @@ function eventLoop(data, 1a, 2a, 2b, 6a) {
   );
 }
 
+function runQuizWorkflow(data) {
+  function runQuiz()
+
+  eventLoop(data, runQuiz)
+}
+
 processor.on("complete", async function(pdfText) {
   // console.log(data.text_pages[0], "extracted text page 1");
-  eventLoop(pdfText)
+
+    switch(options.workflow) {
+      default: runQuizWorkflow(pdfText)
+        
+    }
+    
 });
