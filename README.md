@@ -31,8 +31,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - (currently unused) 1-a -> step 1 happens concurrently/asynchronously with step a 
 
 ## Setup: 
-0. 
-- IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
+0. - IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
 - ELSE prompt user for title&synopsis/summary, and get pageNumber&chunkSize from commandline params or defaults (0,2)
 finally initialize rollingSummary=empty string
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
