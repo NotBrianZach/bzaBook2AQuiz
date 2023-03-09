@@ -7,12 +7,13 @@
       "pageNumber": 0,
       "articleType": "book",
       "chunkSize": 2,
-      "character": "",
+      "narrator": "",
+      "summary": "",
       "mode": "quiz&answer",
       "path": "./Frankenstein.pdf",
       "max_tokens": 2000,
       "executable": "xpdf",
-      "arguments": "-z 200",
+      "exeArguments": "-z 200",
       "prependContext": [""],
       "appendContext": [""]
     }

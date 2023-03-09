@@ -6,8 +6,11 @@ import pdf_extract from "pdf-extract";
 import {createGPTQuery} from "./lib/createGPTQuery.mjs"
 import path from "path"
 console.log(process.argv);
-const readingList = JSON.parse(fs.readFileSync('./readingList.json',
-                             {encoding:'utf8', flag:'r'})).readingList;
+
+function parseJSONFile(filepath) {
+  return JSON.parse(fs.readFileSync(filepath), {encoding:'utf8', flag:'r'})
+}
+const readingList = parseJSONFile('./readingList.json').readingList;
 
 const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY)
 
@@ -56,32 +59,6 @@ var pdfOptions = {
 };
 
 
-//   - ask user for input
-function modifyDefaultUserQuery(optionToAdd, isPrepend) {
-  const modifiedDefaultQuerySchema =  {
-    properties: {
-      nextAction: {
-        type: 'string',                 // Specify the type of input to expect.
-        description:
-        `${isPrepend && optionToAdd}\n
-   C=continue to next page,\n
-   Q=ask a different query \n
-   r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
-   b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
-   d=delete stack of prepended prompts
-   A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
-   D=delete stack of appended prompts${!isPrepend && optionToAdd}
-`
-      }
-    }
-  }
-  const queryValue = await prompt.get(modifyDefaultUserQuery("",false));
-  switch(queryValue) {
-    case "C":
-    default:
-    return queryValue
-  }
-}
 
 function removeExtraWhitespace(str) {
   // removes any instance of two or whitespace (text often has tons of padding characers), and whitespace from end and beginning of str
@@ -114,111 +91,146 @@ const logs = {
 // )}`;
 // // console.log("titlePrompt", titlePrompt);
 // let potentialTitle = queryGPT(titlePrompt)
-
 const existsBookNameInReadingList = readingList[options.bookName] !== undefined
-const currentPageNumber = options.page === undefined ? 0 : options.page;
-const chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize;
-if existsBookNameInReadingList
-async function eventLoop(data, step3a,  step3b, step6a) {
-  const totalPages = data.text_pages.length;
-  console.log("totalPages", totalPages, currentPageNumber, chunkSize);
+if (existsBookNameInReadingList) {
 
-  var titlePromptSchema = {
-    properties: {
-      title: {
-        message:
-        "Enter title",
-        required: true
-      }
-    }
-  };
-  const { title } = await prompt.get(titlePromptSchema);
-
-  var summaryPromptSchema = {
-    properties: {
-      summary: {
-        message:
-        "Enter a summary",
-        required: true
-      }
-    }
-  };
-  const { summary } = await prompt.get(summaryPromptSchema);
-  // let title = ""
-  // if (maybeTitle === "Y") {
-  //   title = potentialTitle
-  // } else {
-  //   title = maybeTitle
-  // }
-  // const titlePrompt = `What follows is the text of the first few pages of a pdf, output only the title: ${removeExtraWhitespace(
-  //   data.text_pages
-  //     .slice(currentPageNumber, currentPageNumber + chunkSize)
-  //     .join("")
-  // )}`;
-  // // console.log("titlePrompt", titlePrompt);
-  // let potentialTitle = queryGPT(titlePrompt)
-  let rollingSummary = ""
-
-  while (currentPageNumber + chunkSize < totalPages) {
-    // 3. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending prependContext&synopsis&title&rollingSummary, appending appendContext, summarize pages[n:n+m]
-    const pageSlice = removeExtraWhitespace(
-      data.text_pages
-        .slice(currentPageNumber, currentPageNumber + chunkSize)
-        .join("")
-    );
-    rollingSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
-    //2. display summary of pages[pageNum:pageNum+chunkSize] and quiz to the user, record user answer to quiz
-    console.log(
-      `Summary of pages ${currentPageNumber} to ${currentPageNumber +
-        chunkSize}:`,
-      rollingSummary
-    );
-
-    step3a(pageSlice, summary, title, )
-
-    //?TODO? have gpt attempt to check the answers to made up quiz
-    // const completionCheckAnswers = await openai.createCompletion({
-    //   model: "text-davinci-003",
-    //   prompt: `What is the correct answer for the quiz above? ${userAnswer}`,
-    //   max_tokens: 2000
-    // });
-    // console.log(`Check answer:`, completionCheckAnswers.data.choices[0].text);
-
-    // 4. query gpt3 w/synopsis+summary of pages[pageNumber:pageNumber+chunkSize] to generate a new rollingSummary
-    const updateMetaSummaryCompletion = queryGPT(`given $SUMMARY$ of book titled ${title.titleKey}${synopsis} $CONTENT$: ${pageSlice} $INSTRUCTIONS$: given $SUMMARY$ and $CONTENT$ of book titled "${title}" generate a quiz bank of questions to test knowledge of $CONTENT$`)
-    console.log(`New Meta Summary:`, synopsis);
-    // var finalPromptSchema = {
-    //   properties: {
-    //     isExit: {
-    //       message:
-    //         "Press any letter except X to continue to next ${chunkSize} page(s), press X to save logs and exit program",
-    //       required: true
-    //     }
-    //   }
-    // };
-    // const { isExit } = await prompt.get(finalPromptSchema);
-    // if (isExit === "X") {
-    //   break;
-    // }
-  }
-
-  logSummary.push(rollingSummary);
-  console.log(logs);
-  // 4. record a log of all the summaries and quizzes
-  step6a(logs)
+} else {
 }
 
-function runQuizWorkflow(pageSlice, synsopsis,) {
+const currentPageNumber = options.page === undefined ? 0 : options.page;
+const chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize;
+
+const totalPages = data.text_pages.length;
+console.log("totalPages", totalPages, currentPageNumber, chunkSize);
+
+var titlePromptSchema = {
+  properties: {
+    title: {
+      message:
+      "Enter title",
+      required: true
+    }
+  }
+};
+const { title } = await prompt.get(titlePromptSchema);
+
+var summaryPromptSchema = {
+  properties: {
+    summary: {
+      message:
+      "Enter a summary",
+      required: true
+    }
+  }
+};
+const { summary } = await prompt.get(summaryPromptSchema);
+// let title = ""
+// if (maybeTitle === "Y") {
+//   title = potentialTitle
+// } else {
+//   title = maybeTitle
+// }
+// const titlePrompt = `What follows is the text of the first few pages of a pdf, output only the title: ${removeExtraWhitespace(
+//   data.text_pages
+//     .slice(currentPageNumber, currentPageNumber + chunkSize)
+//     .join("")
+// )}`;
+// // console.log("titlePrompt", titlePrompt);
+// let potentialTitle = queryGPT(titlePrompt)
+async function eventLoop(curPageNum, rollingSummary, data, step1a, step1b, step2a) {
+    // 1. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending prependContext&synopsis&title&rollingSummary, appending appendContext, summarize pages[n:n+m]
+    const pageSlice = removeExtraWhitespace(
+      data.text_pages
+        .slice(curPageNum, curPageNum + chunkSize)
+        .join("")
+    );
+  const pageChunkSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
+
+
+  let step1aOut = ""
+  if (step1a !== undefined) {
+    step1aOut = step1a(pageSlice, data, summary, rollingSummary, title)
+  }
+  let step1bOut = ""
+  if (step1b !== undefined && step1aOut !== "C") {
+    step1bOut = step1b(pageSlice, data, summary, rollingSummary, title)
+  }
+  // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
+  const newRollingSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT with respect to the rest of the book, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
+
+  let step2aOut = ""
+  if (step2a !== undefined && step1aOut !== "C" && step2aOut !== "C") {
+    step2aOut = step2a(pageSlice, data, summary, rollingSummary, title)
+  }
+  // console.log(
+  //   `Summary of pages ${curPageNum} to ${curPageNum +
+  //     chunkSize}:`,
+  //   rollingSummary
+  // );
+
+    // const newRollingSummary = queryGPT(`given $SUMMARY$ of book titled ${title.titleKey}${synopsis} $CONTENT$: ${pageSlice} $INSTRUCTIONS$: given $SUMMARY$ and $CONTENT$ of book titled "${title}" summarise the book up to this point $CONTENT$`)
+  // 3. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 4.
+    // console.log(`New Meta Summary:`, synopsis);
+  if (curPageNum + chunkSize < totalPages) {
+    logSummary.push(rollingSummary);
+    eventLoop(curPageNum + chunkSize, newRollingSummary, data, step3a, step3b, step6a)
+  } else {
+    console.log(logs);
+    // 4. record a log of all the summaries and quizzes
+    step6a(logs)
+  }
+}
+//   - ask user for input
+function queryUserDefault(optionToAdd, isPrepend, curPageNum, data) {
+  const modifiedDefaultQuerySchema =  {
+    properties: {
+      nextAction: {
+        type: 'string',                 // Specify the type of input to expect.
+        description:
+        `${isPrepend && optionToAdd}\n
+   C=continue to next page,\n
+   Q=ask a different query \n
+   r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
+   b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
+   d=delete stack of prepended prompts
+   A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
+   D=delete stack of appended prompts${!isPrepend && optionToAdd}
+`
+      }
+    }
+  }
+  const queryValue = await prompt.get(queryUserDefault("",false));
+  switch(queryValue) {
+  case "C":
+    return "C"
+  default:
+    return queryValue
+  }
+}
+
+function runQuizWorkflow(pageSlice, synsopsis, title) {
   function runQuiz() {
-    modifyDefaultUserQuery("q", true)
+    queryUserDefault("q", true)
     // * 1.a. generate quiz,
     const quiz =  queryGPT(`INSTRUCTIONS: given SUMMARY and CONTENT of book titled "${title}" generate a quiz bank of questions to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice}`)
     console.log(`Quiz:`, quiz);
     logQuiz.push(quiz);
-    const { answers } = await prompt.get(["Record answers here or single char input&enter to continue"]);
+    const { answers } = await prompt.get(
+      {
+        properties: {
+          answers: {
+            message:
+            "Enter Answers",
+            required: true
+          }
+        }
+      });
+    const grade =  queryGPT(`INSTRUCTIONS: assign a grade in the form { grade: x, question1: ["correct", ""], "question2": ["wrong", "correct answer goes here"], ... }, given SUMMARY and CONTENT of book titled "${title}" to student answers to a quiz to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice}`)
+    console.log(grade)
+    await prompt.get("input most anything to continue")
   }
 
-  eventLoop(data, runQuiz)
+  eventLoop(currentPageNumber, data, runQuiz)
 }
 
 processor.on("complete", async function(pdfText) {

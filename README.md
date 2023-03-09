@@ -53,32 +53,23 @@ finally initialize rollingSummary=empty string
   - D=delete stack of appended prompts
 
 ## Quiz Workflow: 
-- 3.a. generate quiz from pageChunkSummary,
-- 3.b. quiz the user, record user answer to quiz
-- 6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
+- 1.a. generate quiz from pageChunkSummary,
+- 1.b. quiz the user, record user answer to quiz
+- 3.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ## Quiz & Answer Workflow:
-- 3.a. generate quiz,
-- 3.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
-- 4.b. gpt attempts to answer the quiz prints answers,
+- 1.a. generate quiz,
+- 1.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
+- 1.b. gpt attempts to answer the quiz prints answers,
   - query user-> 
     - R for user reply to answers, on other input continue
-- 6.a parting thoughts from gpt3, record a log of all the summaries and quizzes
+- 3.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ## Query Workflow: 
-3.a query user for question, 
-3.b gpt3 request answer user query,  
-  - query user
-    - C=continue to next page,
-    - Q=ask a different query, repeat 1.b
-    - r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,
-    - B="before" prepend next user query input to all non summary gpt requests, repeat 1.b
-      - "tell a joke about the following text:" 
-    - D=delete stack of prepended prompts
-    - A="after" append next user query input to all non summary gpt requests, repeat 1.b
-      - "...tell another joke about the above text that ties into the first joke" 
-    - d=delete stack of appended prompts
-6.a parting thoughts from gpt3, record a log of all questions & answers
+1.a query user for question, 
+1.b gpt3 request answer user query,  
+  - query user default query
+3.a parting thoughts from gpt3, record a log of all questions & answers
 
 ## Optional Toggles (TODO): 
 - Summary Printing: whether or not to print summaries of pageChunks & the rollingSummary
