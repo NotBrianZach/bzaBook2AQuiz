@@ -3,18 +3,18 @@ import { program } from "commander";
 import fs from "fs";
 import prompt from "prompt";
 import pdf_extract from "pdf-extract";
-import createGptQuery from "./lib/createGPTQuery.mjs"
+import {createGPTQuery} from "./lib/createGPTQuery.mjs"
+import path from "path"
 console.log(process.argv);
-const data = fs.readFileSync('./readingList.json',
-                             {encoding:'utf8', flag:'r'});
-
+const readingList = JSON.parse(fs.readFileSync('./readingList.json',
+                             {encoding:'utf8', flag:'r'})).readingList;
 
 const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY)
 
 program
   .version("0.1.0")
   .option("-f, --file <file>", "Path to file to read from")
-  .option("-O, --openAIAPIKey <openAIAPIKey>", "api key").env("openAIAPIKey")
+  .option("-O, --openAIAPIKey <openAIAPIKey>", "api key")// .env("openAIAPIKey")
   .option("-p, --page <page>", "current page number")
   .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
   .option("-w, --workflow <workflow>", "type of workflow")
@@ -31,9 +31,6 @@ if (!options.file) {
   process.exit(1);
 }
 let beforeContext = options.beforeContext
-
-const path = require("path")
-const pdf_extract = require('pdf-extract')
 
 // extract text from scanned image pdf without searchable text
 // console.log("Usage: node thisfile.js the/path/tothe.pdf")
@@ -52,7 +49,7 @@ const pdf_extract = require('pdf-extract')
 // extract text from pdf with searchable text
 var pdfOptions = {
   type: "text", // extract the actual text in the pdf file
-  mode: 'layout' // optional, only applies to 'text' type. Available modes are 'layout', 'simple', 'table' or 'lineprinter'. Default is 'layout'
+  mode: 'layout', // optional, only applies to 'text' type. Available modes are 'layout', 'simple', 'table' or 'lineprinter'. Default is 'layout'
   ocr_flags: ['--psm 1'], // automatically detect page orientation
   enc: 'UTF-8',  // optional, encoding to use for the text output
   clean: true // try prevent tmp directory /usr/run/$userId$ from overfilling with parsed pdf pages (doesn't seem to work)
@@ -61,22 +58,28 @@ var pdfOptions = {
 
 //   - ask user for input
 function modifyDefaultUserQuery(optionToAdd, isPrepend) {
-  const defaultUserQuery = {
+  const modifiedDefaultQuerySchema =  {
     properties: {
       nextAction: {
         type: 'string',                 // Specify the type of input to expect.
         description:
         `${isPrepend && optionToAdd}\n
-         C=continue to next page,\n
-         Q=ask a different query \n
-         r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
-         b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
-         d=delete stack of prepended prompts
-         A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
-         D=delete stack of appended prompts${!isPrepend && optionToAdd}
+   C=continue to next page,\n
+   Q=ask a different query \n
+   r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
+   b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
+   d=delete stack of prepended prompts
+   A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
+   D=delete stack of appended prompts${!isPrepend && optionToAdd}
 `
       }
     }
+  }
+  const queryValue = await prompt.get(modifyDefaultUserQuery("",false));
+  switch(queryValue) {
+    case "C":
+    default:
+    return queryValue
   }
 }
 
@@ -92,34 +95,70 @@ var processor = pdf_extract(options.file, pdfOptions, function(err) {
 });
 
 let synopsis = "";
-let logSummary = [];
-let logQuiz = [];
-const existsBookNameInReadingList = typeof readingList
+
+const logs = {
+  synopsis: "",
+  logSummary: []
+}
+// function recordAndExit (logs) {
+//   fs.writeFileSync(
+//     `./log.json`,
+//     JSON.stringify(logs)
+//   );
+// }
+
+// const titlePrompt = `What follows is the text of the first few pages of a pdf, output only the title: ${removeExtraWhitespace(
+//   data.text_pages
+//     .slice(currentPageNumber, currentPageNumber + chunkSize)
+//     .join("")
+// )}`;
+// // console.log("titlePrompt", titlePrompt);
+// let potentialTitle = queryGPT(titlePrompt)
+
+const existsBookNameInReadingList = readingList[options.bookName] !== undefined
 const currentPageNumber = options.page === undefined ? 0 : options.page;
 const chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize;
-function eventLoop(data, 3a, 3a, 3b, 6a) {
+if existsBookNameInReadingList
+async function eventLoop(data, step3a,  step3b, step6a) {
   const totalPages = data.text_pages.length;
   console.log("totalPages", totalPages, currentPageNumber, chunkSize);
-  // 1. IF EXISTS, load title&synopsis&rollingSummary from readingList.json ELSE try to grab title, query user C=confirm, string=user inputs title, query user for page range of table of contents if input=([0-9]*-[0-9]*) try to synopsize and validate with user, else ask user input synopsis, rollingSummary=empty string
 
-  const titlePrompt = `What follows is the text of the first few pages of a pdf, output the title: ${removeExtraWhitespace(
-    data.text_pages
-      .slice(currentPageNumber, currentPageNumber + chunkSize)
-      .join("")
-  )}`;
-  console.log("titlePrompt", titlePrompt);
-  let potentialTitle = queryGPT(titlePrompt)
   var titlePromptSchema = {
     properties: {
-      validTitle: {
+      title: {
         message:
-        "Press Y if title correct, otherwise enter title",
+        "Enter title",
         required: true
       }
     }
   };
-  const { inputTitle } = await prompt.get(titlePromptSchema);
+  const { title } = await prompt.get(titlePromptSchema);
+
+  var summaryPromptSchema = {
+    properties: {
+      summary: {
+        message:
+        "Enter a summary",
+        required: true
+      }
+    }
+  };
+  const { summary } = await prompt.get(summaryPromptSchema);
+  // let title = ""
+  // if (maybeTitle === "Y") {
+  //   title = potentialTitle
+  // } else {
+  //   title = maybeTitle
+  // }
+  // const titlePrompt = `What follows is the text of the first few pages of a pdf, output only the title: ${removeExtraWhitespace(
+  //   data.text_pages
+  //     .slice(currentPageNumber, currentPageNumber + chunkSize)
+  //     .join("")
+  // )}`;
+  // // console.log("titlePrompt", titlePrompt);
+  // let potentialTitle = queryGPT(titlePrompt)
   let rollingSummary = ""
+
   while (currentPageNumber + chunkSize < totalPages) {
     // 3. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending prependContext&synopsis&title&rollingSummary, appending appendContext, summarize pages[n:n+m]
     const pageSlice = removeExtraWhitespace(
@@ -134,14 +173,8 @@ function eventLoop(data, 3a, 3a, 3b, 6a) {
         chunkSize}:`,
       rollingSummary
     );
-    logSummary.push(rollingSummary);
-    await prompt.get(["Press any a letter+enter to continue to quiz"]);
 
-    // * 1.a. generate quiz,
-    const quiz =  queryGPT(`$SUMMARY$: ${synopsis} $CONTENT$: ${pageSlice} $INSTRUCTIONS$: given $SUMMARY$ and $CONTENT$ of book titled "${title}" generate a quiz bank of questions to test knowledge of $CONTENT$`)
-    console.log(`Quiz:`, quiz);
-    logQuiz.push(quiz);
-    const { answers } = await prompt.get(["Record answers here or single char input&enter to continue"]);
+    step3a(pageSlice, summary, title, )
 
     //?TODO? have gpt attempt to check the answers to made up quiz
     // const completionCheckAnswers = await openai.createCompletion({
@@ -154,46 +187,45 @@ function eventLoop(data, 3a, 3a, 3b, 6a) {
     // 4. query gpt3 w/synopsis+summary of pages[pageNumber:pageNumber+chunkSize] to generate a new rollingSummary
     const updateMetaSummaryCompletion = queryGPT(`given $SUMMARY$ of book titled ${title.titleKey}${synopsis} $CONTENT$: ${pageSlice} $INSTRUCTIONS$: given $SUMMARY$ and $CONTENT$ of book titled "${title}" generate a quiz bank of questions to test knowledge of $CONTENT$`)
     console.log(`New Meta Summary:`, synopsis);
-    var finalPromptSchema = {
-      properties: {
-        isExit: {
-          message:
-            "Press any letter except X to continue to next ${chunkSize} page(s), press X to save logs and exit program",
-          required: true
-        }
-      }
-    };
-    const { isExit } = await prompt.get(finalPromptSchema);
-    if (isExit === "X") {
-      break;
-    }
+    // var finalPromptSchema = {
+    //   properties: {
+    //     isExit: {
+    //       message:
+    //         "Press any letter except X to continue to next ${chunkSize} page(s), press X to save logs and exit program",
+    //       required: true
+    //     }
+    //   }
+    // };
+    // const { isExit } = await prompt.get(finalPromptSchema);
+    // if (isExit === "X") {
+    //   break;
+    // }
   }
 
-  const summary = {
-    synopsis,
-    logSummary,
-    logQuiz
-  }
-  console.log(summary);
+  logSummary.push(rollingSummary);
+  console.log(logs);
   // 4. record a log of all the summaries and quizzes
-  fs.writeFileSync(
-    `./log.json`,
-    JSON.stringify(summary)
-  );
+  step6a(logs)
 }
 
-function runQuizWorkflow(data) {
-  function runQuiz()
+function runQuizWorkflow(pageSlice, synsopsis,) {
+  function runQuiz() {
+    modifyDefaultUserQuery("q", true)
+    // * 1.a. generate quiz,
+    const quiz =  queryGPT(`INSTRUCTIONS: given SUMMARY and CONTENT of book titled "${title}" generate a quiz bank of questions to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice}`)
+    console.log(`Quiz:`, quiz);
+    logQuiz.push(quiz);
+    const { answers } = await prompt.get(["Record answers here or single char input&enter to continue"]);
+  }
 
   eventLoop(data, runQuiz)
 }
 
 processor.on("complete", async function(pdfText) {
   // console.log(data.text_pages[0], "extracted text page 1");
+  switch(options.workflow) {
+    default: runQuizWorkflow(pdfText)
 
-    switch(options.workflow) {
-      default: runQuizWorkflow(pdfText)
-        
-    }
-    
+  }
+
 });

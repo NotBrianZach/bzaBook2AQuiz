@@ -1,6 +1,6 @@
 let
-  nixpkgs.url = "https://github.com/NixOS/nixpkgs/archive/nixos-20.03.tar.gz";
-  nixpkgs.sha256 = "93c88b82d3e3c3e2e3c7819a26fe9e9c3e3f3a3b3c3f3a3b3c3f3a3b382d3e3f";
+  nixpkgs.url = "https://github.com/NixOS/nixpkgs/archive/4d2b37a84fad1091b9de401eb450aae66f1a741e.tar.gz";
+  nixpkgs.sha256 = "11w3wn2yjhaa5pv20gbfbirvjq6i3m7pqrq2msf0g7cv44vijwgw";
 in
 { pkgs ? import <nixpkgs> {} }:
 

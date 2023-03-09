@@ -30,21 +30,15 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - 1.b -> step 1 happens before step a, step b happens after step a
 - (currently unused) 1-a -> step 1 happens concurrently/asynchronously with step a 
 
+## Setup: 
+0. IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
+ELSE prompt user for title&synopsis/summary, and get pageNumber&chunkSize from commandline params or defaults (0,2)
+finally initialize rollingSummary=empty string
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
-1. IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
-ELSE try to grab title w/gpt3 from first chunkSize pages, query user to validate 
-  - C=confirm gpt3 grabbed a valid title, 
-  - any other input is assumed to be the title,
-then query user for page range of table of contents 
-  - if input matches regex ([0-9]*-[0-9]*), grab table of contents from that page range, synopsize with gpt3 and validate with user
-  - else ask user input synopsis, confirm they entered it correctly 
-finally set rollingSummary=empty string
-2. IF readingList.json has an entry for bookName, load pageNumber & chunkSize from there, 
-ELSE set pageNumber & chunkSize from commandline parameters or defaults (0,2)
-3. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
-4. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
-5. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 3. else continue to 6.
-6. call onExit method (cleanup)
+1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
+2. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
+3. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 4.
+4. call onExit method (cleanup)
 
 ## User Query defaults:
 - ask user for input
