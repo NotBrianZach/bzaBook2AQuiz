@@ -40,24 +40,31 @@ finally initialize rollingSummary=empty string
 3. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 4.
 4. call onExit method (cleanup)
 
-## User Query defaults:
+## User Query (default):
 - ask user for input
   - C=continue to next page,
   - r="repeat"/continue the conversation, 
-    - query user, append to prompt 
-    - send prompt to gpt3 (if blank, acts as repeat)
+    - append next user query to prompt 
+    - send prompt to gpt3 (if empty user query, acts as repeat)
     - wait for further user input
-  - p="pageChunkSummary" start printing all pageChunkSummary going forward
-  - R="rollingSummary" start printing rollingSummary 
   - Q=ask a different query w/current context 
-- modify query options
-  - b="before" prepend next user query input to all non summary gpt requests
+- modify what prints out
+  - h="help" toggle printing query options
+  - R="rollingSummary" toggle printing rollingSummary 
+  - p="pageChunkSummary" toggle printing pageChunkSummary
+- modify all non summary gpt queries going forward
+  - b="before" prepend next user query input
     - "tell a joke about the following text:" 
   - d=delete stack of prepended prompts
   - A="after" append next user query input to all non summary gpt requests
     - "...tell another joke about the above text that ties into the first joke" 
   - D=delete stack of appended prompts
-  - l=change response length
+  - t=change response length/max token count (default 2000, max = 4096 includes prompt)
+- TODO
+  - Narration toggle: rewrite all output in the voice of a character
+  - Voice Output toggle: use [TTS](https://github.com/coqui-ai/TTS) to generate voice to narrate gpt response & queries to user
+  - Voice Input Toggle: use talon to allow voice input?
+  - (not sure how want to implement, probably not in loop) Narrate Title & Summary toggle: 1.a also rewrite the title & summary in character voice prior to all other queries (after user has confirmed them)
 
 ## Query Workflow: 
 - 1.a query user w/default options, 
@@ -65,21 +72,11 @@ finally initialize rollingSummary=empty string
 - 3.a parting thoughts from gpt3, record a log of all questions & answers
 
 ## Quiz Workflow (Default):
-- 1.a. generate quiz,
-- 1.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
-- 1.b. gpt attempts to answer the quiz prints answers,
-  - query user-> 
-    - R for user reply to answers, on other input continue
+- 1.a. query gpt3 to generate quiz, print quiz, query user for answers
+- 1.b. query gpt3 for "grade", explain "wrong" answers
+  - default workflow
 - 3.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
-
-## Optional Toggles (TODO): 
-- Summary Printing: whether or not to print summaries of pageChunks & the rollingSummary
-- Narration toggle: rewrite all output in the voice of a character
-- Narration: use [TTS](https://github.com/coqui-ai/TTS) to generate voice to narrate gpt response & queries to user
-- Voice Dictation: use talon to allow voice input?
-- Narrate Title & Summary toggle: 1.a also rewrite the title & summary in character voice prior to all other queries (after user has confirmed them)
-- Narrate Pages toggle: a.3 also rewrite the page chunks in character voice prior to all other queries
 
 ## Options & Defaults (readingList.json): 
 - Article format: [pdf, html, epub]

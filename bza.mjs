@@ -145,12 +145,12 @@ async function queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt) {
     case "r":
       query = await prompt(["query"])
       gptResponse = queryGPT(`${gptPrompt}\n${query}`)
-      queryUserDefault(optionToAdd, isPrepend, curPageNum, gptResponse)
+      return queryUserDefault(optionToAdd, isPrepend, curPageNum, gptResponse)
       break
     case "Q":
       query = await prompt(["query"])
       gptResponse = queryGPT(`${gptPrompt}`)
-      queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt)
+      return queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt)
       break
 
     // b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
@@ -199,7 +199,7 @@ async function eventLoop(pdfTxt, curPageNum, rollingSummary,  step1a, step1b, st
     // console.log(`New Meta Summary:`, synopsis);
   if (curPageNum + chunkSize < totalPages) {
     // logSummary.push(rollingSummary);
-    eventLoop(pdfTxt, curPageNum + chunkSize, newRollingSummary, step1a, step1b, step2a, step4a)
+    return eventLoop(pdfTxt, curPageNum + chunkSize, newRollingSummary, step1a, step1b, step2a, step4a)
   } else {
     console.log(logs);
     // 4. record a log of all the summaries and quizzes
