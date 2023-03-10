@@ -28,11 +28,46 @@ program
   .option("-C, --character <character>", "character to reply as")
 //TODO .option("-t, --type <type>", "pdf, html")
   .parse(process.argv);
+
 const options = program.opts();
 console.log(options);
 if (!options.file && typeof options.bookName !== "string") {
   console.error("No file specified e.g. ./Frankenstein.pdf");
   process.exit(1);
+}
+
+function validateObj(object, key, values) {
+  if (object[key] && values.includes(object[key])) {
+    return true;
+  }
+  return false;
+}
+
+function writeToReadingList(readOptions) {
+  validateObj(options, "articleType", readingList.articleTypeValues)
+  validateObj(options, "modeValues", readingList.modeValues)
+  if (typeof options.bookName === "string") {
+    //readingList entry exists
+    let readingListEntry = {
+      pageNumber: readOptions.pageNumber || 0,
+      articleType: readOptions.articleType || "",
+      chunkSize: readOptions.chunkSize || 2,
+      narrator: readOptions.narrator || "",
+      summary: readOptions.summary || "",
+      mode: readOptions.mode || "quiz&answer",
+      isPrintSummary: readOptions.isPrintSummary || true,
+      path: readOptions.path || "",
+      max_tokens: readOptions.max_tokens || 2000,
+      executable: readOptions.executable || "xpdf",
+      exeArguments: readOptions.exeArguments || "-z 200",
+      prependContext: readOptions.prependContext || [""],
+      appendContext: readOptions.appendContext || [""]
+    };
+    //write to readingList
+    fs.writeFileSync(`./readingList.json`, JSON.stringify(readingListEntry));
+  } else {
+    console.log("No book name supplied to write list");
+  }
 }
 let beforeContext = options.beforeContext
 function removeExtraWhitespace(str) {
@@ -193,10 +228,12 @@ async function runQuizWorkflow(pdfTxt, synopsis, title) {
           }
         }
       });
-    const grade =  await queryGPT(`INSTRUCTIONS: assign a grade in the form { grade: x, question1: ["correct", ""], "question2": ["wrong", "correct answer goes here"], ... }, given SUMMARY and CONTENT of book titled "${title}" to student answers to a quiz to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice}`)
+    const grade =  await queryGPT(`assign a grade in format { grade: x, question1: ["correct", ""], "question2": ["wrong", "correct answer goes here"], ... }, given {SUMMARY} and {CONTENT} of book titled "${title}" to {student answers} to a {QUIZ} to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice} {QUIZ}: quiz {STUDENT ANSWERS}: ${answers}`)
     console.log("grade", grade)
     return await prompt.get("input most anything to continue")
   }
+
+  // step4aOut = step4a(title, synopsis, pageSlice, pdfTxt, rollingSummary)
   // pdfTxt, curPageNum, rollingSummary,  step1a, step1b, step2a, step4a
   eventLoop(pdfTxt, currentPageNumber, "", runQuiz)
 }

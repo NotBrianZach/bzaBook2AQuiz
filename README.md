@@ -44,6 +44,7 @@ finally initialize rollingSummary=empty string
 - ask user for input
   - C=continue to next page,
   - r="repeat"/continue the conversation, query gpt3 w/user reply on question answer
+  - n="narrate"
   - Q=ask a different query w/current context 
 - modify query options
   - b="before" prepend next user query input to all non summary gpt requests
@@ -54,12 +55,12 @@ finally initialize rollingSummary=empty string
   - D=delete stack of appended prompts
   - l=change response length
 
-## Quiz Workflow: 
-- 1.a. generate quiz from pageChunkSummary,
-- 1.b. quiz the user, record user answer to quiz
-- 3.a parting thoughts from gpt3, record a log of all the summaries and quizzes
+## Query Workflow: 
+- 1.a query user w/default options, 
+- 1.b send query to gpt3 print response,
+- 3.a parting thoughts from gpt3, record a log of all questions & answers
 
-## Quiz & Answer Workflow:
+## Quiz Workflow (Default):
 - 1.a. generate quiz,
 - 1.a. display summary of pages[pageNumber:pageNumber+chunkSize] and quiz to the user, record user answer to quiz
 - 1.b. gpt attempts to answer the quiz prints answers,
@@ -67,17 +68,12 @@ finally initialize rollingSummary=empty string
     - R for user reply to answers, on other input continue
 - 3.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
-## Query Workflow: 
-- 1.a query user for question, 
-- 1.b gpt3 request answer user query,
-  - query user default query
-- 3.a parting thoughts from gpt3, record a log of all questions & answers
 
 ## Optional Toggles (TODO): 
 - Summary Printing: whether or not to print summaries of pageChunks & the rollingSummary
+- Narration toggle: rewrite all output in the voice of a character
 - Narration: use [TTS](https://github.com/coqui-ai/TTS) to generate voice to narrate gpt response & queries to user
 - Voice Dictation: use talon to allow voice input?
-- Narration toggle: rewrite all output in the voice of a character
 - Narrate Title & Summary toggle: 1.a also rewrite the title & summary in character voice prior to all other queries (after user has confirmed them)
 - Narrate Pages toggle: a.3 also rewrite the page chunks in character voice prior to all other queries
 

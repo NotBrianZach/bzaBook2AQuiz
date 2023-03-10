@@ -1,5 +1,5 @@
 {
-  "modeValues": ["quiz&answer", "quiz", "query", "narrate"],
+  "modeValues": ["quiz&answer", "query", "narrate"],
   "articleTypeValues": ["book", "research paper", ""],
   "exampleCharacterValues": ["","socrates", "lao-tzu", "mike tyson"],
   "readingList": {
@@ -10,6 +10,7 @@
       "narrator": "",
       "summary": "",
       "mode": "quiz&answer",
+      "isPrintSummary": true,
       "path": "./Frankenstein.pdf",
       "max_tokens": 2000,
       "executable": "xpdf",
