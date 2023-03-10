@@ -233,7 +233,6 @@ async function runQuizWorkflow(pdfTxt, synopsis, title) {
     return await prompt.get("input most anything to continue")
   }
 
-  // step4aOut = step4a(title, synopsis, pageSlice, pdfTxt, rollingSummary)
   // pdfTxt, curPageNum, rollingSummary,  step1a, step1b, step2a, step4a
   eventLoop(pdfTxt, currentPageNumber, "", runQuiz)
 }
