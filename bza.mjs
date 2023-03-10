@@ -88,17 +88,17 @@ async function queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt) {
   const modifiedDefaultQuerySchema =  {
     properties: {
       nextAction: {
-        type: 'string',                 // Specify the type of input to expect.
+        type: 'string', // Specify the type of input to expect.
         description:
         `${isPrepend && optionToAdd}\n
-   C=continue to next page,\n
-   Q=ask a different query \n
-   r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
-   b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
-   d=delete stack of prepended prompts
-   A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
-   D=delete stack of appended prompts${!isPrepend && optionToAdd}
-`
+         C=continue to next page,\n
+         Q=ask a different query \n
+         r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
+         b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
+         d=delete stack of prepended prompts
+         A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
+         D=delete stack of appended prompts${!isPrepend && optionToAdd}
+        `
       }
     }
   }
@@ -111,11 +111,11 @@ async function queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt) {
       gptResponse = queryGPT(`${gptPrompt}\n${query}`)
       queryUserDefault(optionToAdd, isPrepend, curPageNum, gptResponse)
       break
-  case "Q":
-    query = await prompt(["query"])
-    gptResponse = queryGPT(`${gptPrompt}`)
-    queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt)
-    break
+    case "Q":
+      query = await prompt(["query"])
+      gptResponse = queryGPT(`${gptPrompt}`)
+      queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt)
+      break
 
     // b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
     // d=delete stack of prepended prompts
@@ -128,15 +128,14 @@ async function queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt) {
 
 async function eventLoop(pdfTxt, curPageNum, rollingSummary,  step1a, step1b, step2a, step4a) {
   const totalPages = pdfTxt.text_pages.length;
-  // console.log("totalPages", totalPages, currentPageNumber, chunkSize);
-    // 1. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending prependContext&synopsis&title&rollingSummary, appending appendContext, summarize pages[n:n+m]
-    const pageSlice = removeExtraWhitespace(
-      pdfTxt.text_pages
-        .slice(curPageNum, curPageNum + chunkSize)
-        .join("")
-    );
+  console.log("totalPages", totalPages, currentPageNumber, chunkSize);
+  // 1. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending prependContext&synopsis&title&rollingSummary, appending appendContext, summarize pages[n:n+m]
+  const pageSlice = removeExtraWhitespace(
+    pdfTxt.text_pages
+      .slice(curPageNum, curPageNum + chunkSize)
+      .join("")
+  );
   const pageChunkSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
-
 
   let step1aOut = ""
   if (step1a !== undefined) {
@@ -193,8 +192,8 @@ async function runQuizWorkflow(pdfTxt, synopsis, title) {
           }
         }
       });
-    const grade =  queryGPT(`INSTRUCTIONS: assign a grade in the form { grade: x, question1: ["correct", ""], "question2": ["wrong", "correct answer goes here"], ... }, given SUMMARY and CONTENT of book titled "${title}" to student answers to a quiz to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice}`)
-    console.log(grade)
+    const grade =  await queryGPT(`INSTRUCTIONS: assign a grade in the form { grade: x, question1: ["correct", ""], "question2": ["wrong", "correct answer goes here"], ... }, given SUMMARY and CONTENT of book titled "${title}" to student answers to a quiz to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice}`)
+    console.log("grade", grade)
     return await prompt.get("input most anything to continue")
   }
   // pdfTxt, curPageNum, rollingSummary,  step1a, step1b, step2a, step4a
