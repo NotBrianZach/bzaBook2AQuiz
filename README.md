@@ -86,9 +86,9 @@ finally initialize rollingSummary=empty string
 - Article Type: [book, research paper, news]
 
 ## Reading List Utility (bzaUtil.sh)
-store path to pdf and relevant executable to read it
-backup & rotate logs
-switch between query or quiz mode without losing page context using logs
+- store path to pdf and relevant executable to read it
+- backup & rotate logs
+- switch between query or quiz mode without losing page context using logs
 
 ## Design Decisions
 pdf-extract introduces a bunch of binary dependencies relative to alternative libraries but we want those because they enable ocr on the subset of pdfs that don't cleanly delineate text (and I am guessing they are fast hopefully).
