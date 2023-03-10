@@ -139,7 +139,7 @@ https://www.reddit.com/r/singularity/comments/11ho23y/first_post_in_reddit_mista
 
 and a within a couple minutes, after some good ole reddit arguing, i started writing this
 
-** Pushdown Large Language Models
+## Pushdown Large Language Models
 
 a final thought, about fundamental models of computation
 
