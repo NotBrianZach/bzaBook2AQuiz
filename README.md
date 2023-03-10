@@ -16,7 +16,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - `git clone https://github.com/NotBrianZach/bzabook2aquiz.git`
 - `cd bzabook2aquiz`
-- `nix-shell` (flake is work in progress, cant promise this will work out of the box quite yet)
+- `nix-shell`
 - `npm install`
 - get $OPENAI_API_KEY key [here](https://platform.openai.com/account/api-keys) if u dont have 
 - `OPENAI_API_KEY=$OPENAI_API_KEY ./bza.mjs -f path_2_ur_pdf_here.pdf`
@@ -43,14 +43,16 @@ finally initialize rollingSummary=empty string
 ## User Query defaults:
 - ask user for input
   - C=continue to next page,
-  - Q=ask a different query, repeat 1.b
   - r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,
+  - Q=ask a different query w/current context 
+- modify query options
   - b="before" prepend next user query input to all non summary gpt requests, repeat 1.b
     - "tell a joke about the following text:" 
   - d=delete stack of prepended prompts
   - A="after" append next user query input to all non summary gpt requests, repeat 1.b
     - "...tell another joke about the above text that ties into the first joke" 
   - D=delete stack of appended prompts
+  - l=change response length
 
 ## Quiz Workflow: 
 - 1.a. generate quiz from pageChunkSummary,

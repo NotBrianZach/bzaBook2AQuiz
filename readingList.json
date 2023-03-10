@@ -3,7 +3,7 @@
   "articleTypeValues": ["book", "research paper", ""],
   "exampleCharacterValues": ["","socrates", "lao-tzu", "mike tyson"],
   "readingList": {
-    "frankenstein": {
+    "Frankenstein": {
       "pageNumber": 0,
       "articleType": "book",
       "chunkSize": 2,
