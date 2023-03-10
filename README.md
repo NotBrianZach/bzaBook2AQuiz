@@ -33,11 +33,11 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 ## Event Loop Setup: 
 0. - IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
    - ELSE prompt user for title&synopsis/summary, and get pageNumber&chunkSize from commandline params or defaults (0,2)
-finally initialize rollingSummary=empty string
+   - finally initialize rollingSummary=empty string
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
 1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
 2. query user w/default options, 
-3. send query to gpt3 print response,
+3. send query to gpt3&print response,
 4. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
 5. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 4.
 6. parting thoughts from gpt3, call onExit method (cleanup)
@@ -72,7 +72,6 @@ finally initialize rollingSummary=empty string
 - 1.a. query gpt3 to generate quiz, print quiz, query user for answers
 - 1.b. query gpt3 for "grade", explain "wrong" answers
 - 1.c. record a log of all the summaries and quizzes 
-
 
 ## Options & Defaults (readingList.json): 
 - Article format: [pdf, html, epub]

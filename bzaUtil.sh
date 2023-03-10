@@ -2,7 +2,7 @@
 const { program } =require("commander");
 const fs = require("fs");
 const prompt  = require("prompt");
-const { exec } =  require('child_process');
+const { exec, spawn } =  require('child_process');
 const path = require("path");
 console.log(process.argv);
 readingList = JSON.parse(fs.readFileSync(path.resolve("./readingList.json")))
@@ -26,6 +26,11 @@ program
   .parse(process.argv);
 const options = program.opts();
 console.log(options);
+
+// exec('"/path/to/test file/test.sh" arg1 arg2');
+// // Double quotes are used so that the space in the path is not interpreted as
+// // a delimiter of multiple arguments
+spawn("xpdf", ["./Frankenstein.pdf", "-z", 200])
 // # if (!options.file) {
 // #   console.error("No file specified e.g. ./.pdf");
 // #   process.exit(1);
