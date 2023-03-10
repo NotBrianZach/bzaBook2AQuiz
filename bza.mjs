@@ -77,8 +77,17 @@ function removeExtraWhitespace(str) {
 }
 
 const logs = {
+  title: "",
   synopsis: "",
-  logSummary: []
+  pageChunkSummary: {},
+  rollingSummary: {},
+  quizzes: {
+    "0-2": {
+      questions: "",
+      answers: "",
+      readingList: {}
+    }
+  }
 }
 
 const readingListBook = readingList[options.bookName]
@@ -128,13 +137,26 @@ async function queryUserDefault(title, synopsis, bodyTxt, pageSlice, rollingSumm
       nextAction: {
         type: 'string', // Specify the type of input to expect.
         message:
-        `C=continue to next page,\n
-         Q=ask a different query \n
-         r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
-         b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
-         d=delete stack of prepended prompts
-         A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
-         D=delete stack of appended prompts
+        `
+- C=continue to next pageChunk,\n
+- ask user for input\n
+  - r="repeat"/continue the conversation,\n
+    - append next user query to prompt\n
+    - send prompt to gpt3 (if empty user query, acts as repeat)\n
+    - wait for further user input\n
+  - Q=ask a different query w/current context\n
+- modify what prints out\n
+  - h="help" toggle printing query options\n
+  - R="rollingSummary" toggle printing rollingSummary\n
+  - p="pageChunkSummary" toggle printing pageChunkSummary\n
+- modify all non summary gpt queries going forward\n
+  - b="before" prepend next user query input\n
+    - "tell a joke about the following text:"\n
+  - d=delete stack of prepended prompts\n
+  - A="after" append next user query input to all non summary gpt requests\n
+    - "...tell another joke about the above text that ties into the first joke"\n
+  - D=delete stack of appended prompts\n
+  - t=change response length/max token count (default 2000, max = 4096 includes prompt)\n
         `
       }
     }
@@ -175,7 +197,7 @@ async function queryUserDefault(title, synopsis, bodyTxt, pageSlice, rollingSumm
     // b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
     // d=delete stack of prepended prompts
     // A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
-    // D=delete stack of appended prompts${!isPrepend && optionToAdd}
+    // D=delete stack of appended prompts
     default:
       // case C returns C here
       return queryValue
