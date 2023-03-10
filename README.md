@@ -68,10 +68,10 @@ finally initialize rollingSummary=empty string
 - 3.a parting thoughts from gpt3, record a log of all the summaries and quizzes
 
 ## Query Workflow: 
-1.a query user for question, 
-1.b gpt3 request answer user query,  
+- 1.a query user for question, 
+- 1.b gpt3 request answer user query,
   - query user default query
-3.a parting thoughts from gpt3, record a log of all questions & answers
+- 3.a parting thoughts from gpt3, record a log of all questions & answers
 
 ## Optional Toggles (TODO): 
 - Summary Printing: whether or not to print summaries of pageChunks & the rollingSummary
