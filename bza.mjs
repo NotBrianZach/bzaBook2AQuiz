@@ -120,20 +120,21 @@ if (existsBookNameInReadingList) {
 // fs.writeFileSync()
 
 //   - ask user for input
-async function queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt) {
+
+// title, synopsis, pageSlice, bodyTxt, rollingSummary
+async function queryUserDefault(title, synopsis, bodyTxt, pageSlice, rollingSummary, gptPrompt) {
   const modifiedDefaultQuerySchema =  {
     properties: {
       nextAction: {
         type: 'string', // Specify the type of input to expect.
-        description:
-        `${isPrepend && optionToAdd}\n
-         C=continue to next page,\n
+        message:
+        `C=continue to next page,\n
          Q=ask a different query \n
          r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,\n
          b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
          d=delete stack of prepended prompts
          A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
-         D=delete stack of appended prompts${!isPrepend && optionToAdd}
+         D=delete stack of appended prompts
         `
       }
     }
@@ -142,22 +143,41 @@ async function queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt) {
   let query = ""
   let gptResponse = ""
   switch(queryValue) {
+    // - ask user for input
     case "r":
-      query = await prompt(["query"])
-      gptResponse = queryGPT(`${gptPrompt}\n${query}`)
-      return queryUserDefault(optionToAdd, isPrepend, curPageNum, gptResponse)
-      break
+    //   - r="repeat"/continue the conversation,
+    //   - append next user query to prompt
+    //   - send prompt to gpt3 (if empty user query, acts as repeat)
+    //   - wait for further user input
+      nextUserQuery = await prompt(["nextUserQuery"])
+      const nextUserQueryPrompt = `${gptPrompt}\n${nextUserQuery}`
+      console.log("nextUserQueryPrompt:", nextUserQueryPrompt)
+      gptResponse = queryGPT(nextUserQueryPrompt)
+      console.log("gptResponse", gptResponse)
+      return queryUserDefault(optionToAdd, isPrepend, gptResponse)
     case "Q":
       query = await prompt(["query"])
       gptResponse = queryGPT(`${gptPrompt}`)
-      return queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt)
-      break
+      return queryUserDefault(optionToAdd, isPrepend, gptPrompt)
 
+    // - modify what prints out
+    // - h="help" toggle printing query options
+    // - R="rollingSummary" toggle printing rollingSummary
+    // - p="pageChunkSummary" toggle printing pageChunkSummary
+    // - modify all non summary gpt queries going forward
+    // - b="before" prepend next user query input
+    // - "tell a joke about the following text:"
+    // - d=delete stack of prepended prompts
+    // - A="after" append next user query input to all non summary gpt requests
+    // - "...tell another joke about the above text that ties into the first joke"
+    // - D=delete stack of appended prompts
+    // - t=change response length/max token count (default 2000, max = 4096 includes prompt)
     // b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
     // d=delete stack of prepended prompts
     // A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
     // D=delete stack of appended prompts${!isPrepend && optionToAdd}
     default:
+      // case C returns C here
       return queryValue
   }
 }
@@ -181,6 +201,7 @@ async function eventLoop(pdfTxt, curPageNum, rollingSummary,  step1a, step1b, st
   if (step1b !== undefined && step1aOut !== "C") {
     step1bOut = step1b(title, synopsis, pageSlice, pdfTxt, rollingSummary)
   }
+  queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt)
   // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
   const newRollingSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT with respect to the rest of the book, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
 

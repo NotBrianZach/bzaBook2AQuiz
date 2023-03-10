@@ -36,13 +36,15 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 finally initialize rollingSummary=empty string
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
 1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
-2. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
-3. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 4.
-4. call onExit method (cleanup)
+2. query user w/default options, 
+3. send query to gpt3 print response,
+4. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
+5. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 4.
+6. parting thoughts from gpt3, call onExit method (cleanup)
 
 ## User Query (default):
+- C=continue to next pageChunk,
 - ask user for input
-  - C=continue to next page,
   - r="repeat"/continue the conversation, 
     - append next user query to prompt 
     - send prompt to gpt3 (if empty user query, acts as repeat)
@@ -66,16 +68,10 @@ finally initialize rollingSummary=empty string
   - Voice Input Toggle: use talon to allow voice input?
   - (not sure how want to implement, probably not in loop) Narrate Title & Summary toggle: 1.a also rewrite the title & summary in character voice prior to all other queries (after user has confirmed them)
 
-## Query Workflow: 
-- 1.a query user w/default options, 
-- 1.b send query to gpt3 print response,
-- 3.a parting thoughts from gpt3, record a log of all questions & answers
-
 ## Quiz Workflow (Default):
 - 1.a. query gpt3 to generate quiz, print quiz, query user for answers
 - 1.b. query gpt3 for "grade", explain "wrong" answers
-  - default workflow
-- 3.a parting thoughts from gpt3, record a log of all the summaries and quizzes
+- 1.c. record a log of all the summaries and quizzes 
 
 
 ## Options & Defaults (readingList.json): 
