@@ -43,13 +43,13 @@ finally initialize rollingSummary=empty string
 ## User Query defaults:
 - ask user for input
   - C=continue to next page,
-  - r="repeat"/continue the conversation, query gpt3 w/user reply on question answer,
+  - r="repeat"/continue the conversation, query gpt3 w/user reply on question answer
   - Q=ask a different query w/current context 
 - modify query options
-  - b="before" prepend next user query input to all non summary gpt requests, repeat 1.b
+  - b="before" prepend next user query input to all non summary gpt requests
     - "tell a joke about the following text:" 
   - d=delete stack of prepended prompts
-  - A="after" append next user query input to all non summary gpt requests, repeat 1.b
+  - A="after" append next user query input to all non summary gpt requests
     - "...tell another joke about the above text that ties into the first joke" 
   - D=delete stack of appended prompts
   - l=change response length
