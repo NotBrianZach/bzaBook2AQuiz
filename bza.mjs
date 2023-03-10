@@ -82,6 +82,7 @@ if (existsBookNameInReadingList) {
   const { synopsis } = await prompt.get(summaryPromptSchema);
 }
 
+// fs.writeFileSync()
 
 //   - ask user for input
 async function queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt) {

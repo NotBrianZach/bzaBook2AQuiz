@@ -30,7 +30,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - 1.b -> step 1 happens before step a, step b happens after step a
 - (currently unused) 1-a -> step 1 happens concurrently/asynchronously with step a 
 
-## Setup: 
+## Event Loop Setup: 
 0. - IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
    - ELSE prompt user for title&synopsis/summary, and get pageNumber&chunkSize from commandline params or defaults (0,2)
 finally initialize rollingSummary=empty string
