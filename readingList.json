@@ -1,6 +1,7 @@
 {
-  "modeValues": ["quiz&answer", "query", "narrate"],
+  "modeValues": ["quiz", "query"],
   "articleTypeValues": ["book", "research paper", ""],
+  "summaryValues": ["pagechunk", "rolling", "both"],
   "exampleCharacterValues": ["","socrates", "lao-tzu", "mike tyson"],
   "readingList": {
     "Frankenstein": {
@@ -8,7 +9,9 @@
       "articleType": "book",
       "chunkSize": 2,
       "narrator": "",
-      "summary": "",
+      "isPrintPage": "",
+      "isPrintPageChunkSummary": "",
+      "isPrintRollingSummary": "",
       "mode": "quiz&answer",
       "isPrintSummary": true,
       "path": "./Frankenstein.pdf",

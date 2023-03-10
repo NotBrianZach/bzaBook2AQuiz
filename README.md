@@ -43,8 +43,12 @@ finally initialize rollingSummary=empty string
 ## User Query defaults:
 - ask user for input
   - C=continue to next page,
-  - r="repeat"/continue the conversation, query gpt3 w/user reply on question answer
-  - n="narrate"
+  - r="repeat"/continue the conversation, 
+    - query user, append to prompt 
+    - send prompt to gpt3 (if blank, acts as repeat)
+    - wait for further user input
+  - p="pageChunkSummary" start printing all pageChunkSummary going forward
+  - R="rollingSummary" start printing rollingSummary 
   - Q=ask a different query w/current context 
 - modify query options
   - b="before" prepend next user query input to all non summary gpt requests

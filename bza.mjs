@@ -7,10 +7,6 @@ import {createGPTQuery} from "./lib/createGPTQuery.mjs"
 import path from "path"
 console.log(process.argv);
 
-function parseJSONFile(filepath) {
-  return JSON.parse(fs.readFileSync(filepath), {encoding:'utf8', flag:'r'})
-}
-const readingList = parseJSONFile('./readingList.json').readingList;
 
 const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY)
 
@@ -35,6 +31,11 @@ if (!options.file && typeof options.bookName !== "string") {
   console.error("No file specified e.g. ./Frankenstein.pdf");
   process.exit(1);
 }
+
+function parseJSONFile(filepath) {
+  return JSON.parse(fs.readFileSync(filepath), {encoding:'utf8', flag:'r'})
+}
+const readingList = parseJSONFile('./readingList.json').readingList;
 
 function validateObj(object, key, values) {
   if (object[key] && values.includes(object[key])) {
@@ -92,7 +93,6 @@ if (existsBookNameInReadingList) {
   title = options.bookName
   options.file = readingListBook.path
   synopsis = readingListBook.summary
-
 } else {
   var titlePromptSchema = {
     properties: {
