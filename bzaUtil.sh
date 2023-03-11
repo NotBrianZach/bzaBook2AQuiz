@@ -27,6 +27,15 @@ program
 const options = program.opts();
 console.log(options);
 
+// const { convert } = require('html-to-text');
+
+// const html = '<a href="/page.html">Page</a><a href="!#" class="button">Action</a>';
+// const text = convert(html, {
+//   selectors: [
+//     { selector: 'a', options: { baseUrl: 'https://example.com' } },
+//     { selector: 'a.button', format: 'skip' }
+//   ]
+// });
 // exec('"/path/to/test file/test.sh" arg1 arg2');
 // // Double quotes are used so that the space in the path is not interpreted as
 // // a delimiter of multiple arguments

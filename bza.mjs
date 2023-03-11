@@ -17,7 +17,6 @@ program
   .option("-O, --openAIAPIKey <openAIAPIKey>", "api key")// .env("openAIAPIKey")
   .option("-p, --page <page>", "current page number")
   .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
-  .option("-w, --workflow <workflow>", "type of workflow")
   .option("-I, --isPDFImage <isPDFImage>", "if pdf is a scanned image w/no searchable text")
   // .option("-b, --before <beforeContext>", "context provided to gpt at beginning of each request")
   // .option("-a, --after <afterContext>", "context provide to llm at end of each request")
@@ -95,8 +94,12 @@ const existsBookNameInReadingList = readingListBook !== undefined
 let currentPageNumber = options.page === undefined ? 0 : options.page
 let chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize
 let title = ""
-let synopsis = ""
+let readingOpts = {}
 if (existsBookNameInReadingList) {
+  title = options.bookName
+  readingOpts = {
+    ...readinglistBook
+  }
   currentPageNumber = readingListBook.pageNumber
   chunkSize = readingListBook.chunkSize
   title = options.bookName
@@ -124,6 +127,7 @@ if (existsBookNameInReadingList) {
     }
   };
   const { synopsis } = await prompt.get(summaryPromptSchema);
+  readingOpts = { ...readingList.readingOptsDefaults}
 }
 
 // fs.writeFileSync()
