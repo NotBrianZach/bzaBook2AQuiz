@@ -43,7 +43,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
   - q="quiz" toggle quiz loop
     -  query gpt3 to generate quiz, print quiz, query user for answers
     -  query gpt3 for "grade", explain "wrong" answers
-    -  record a log of all the summaries and quizzes 
+    -  record a log of the quiz&answer
     -  Query User again
 - TOGGLE printing to console
   - h="help" query options
