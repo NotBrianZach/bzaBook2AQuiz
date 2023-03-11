@@ -61,8 +61,6 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
   - D=delete stack of appended prompts
   - l="length" change response length/max token count (default 2000, max = 4096 includes prompt)
 
-## Quiz Workflow (Default):
-
 ## Options & Defaults (readingList.json): 
 - Article format: [pdf, html, epub]
 - Article Type: [book, research paper, news]
