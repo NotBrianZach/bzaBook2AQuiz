@@ -68,7 +68,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 ## Reading List Utility (bzaUtil.sh)
 - store path to pdf and relevant executable to read it
 - backup & rotate logs
-- switch between query or quiz mode without losing page context using logs
+- restore from logs
 
 ## Design Decisions
 pdf-extract introduces a bunch of binary dependencies relative to alternative libraries but we want those because they enable ocr on the subset of pdfs that don't cleanly delineate text (and I am guessing they are fast hopefully).
