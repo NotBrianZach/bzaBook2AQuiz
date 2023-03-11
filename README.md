@@ -2,7 +2,7 @@
 
 Interactive books. Books sliced up like pizza. Book pizza. Bza.
 
-It takes a pdf, or in the future maybe webpages or epubs, and feeds it a few pages at a time into a ai chatbot, then outputs something, for example, a quiz on the topic of the pages it read and then waits for some form of user input to tell it to, for example, continue on or record the quiz results.
+It takes a pdf, or in the future maybe webpages or epubs, and feeds it a few pages at a time into chatgpt or similar, then outputs something, for example, a quiz on the topic of the pages it read and then waits for some form of user input to tell it to, for example, continue on or record the quiz results.
 
 Thus it could provide a way to read more actively. 
 
@@ -40,8 +40,8 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - ASK user for input
   - r="repeat"/continue the conversation, 
   - R="Restart" restart conversation w/only initial prompt
-- MODIFY EVENT LOOP
-  - q="quiz" toggle quiz loop (step 2.a. in Event Loop, prior to Query User, after summaries):
+- EVENT LOOP MODIFICATON TOGGLES
+  - q="quiz" quiz loop (step 2.a. in Event Loop, prior to Query User, after summaries):
     -  query gpt3 to generate quiz, print quiz, query user for answers
     -  query gpt3 for "grade", explain "wrong" answers
     -  record a log of the quiz&answer
@@ -63,7 +63,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
   - l="length" change response length/max token count (default 2000, max = 4096 includes prompt)
 
 ## Options & Defaults (readingList.json): 
-- Article format: [pdf, html, epub]
+- Article format: [pdf, TODO html, TODO epub]
 - Article Type: [book, research paper, news]
 
 ## Reading List Utility (bzaUtil.sh)
@@ -72,7 +72,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - restore from logs
 
 ## Design Decisions
-pdf-extract introduces a bunch of binary dependencies relative to alternative libraries but we want those because they enable ocr on the subset of pdfs that don't cleanly delineate text (and I am guessing they are fast hopefully).
+pdf-extract introduces a bunch of binary dependencies relative to alternative libraries but we want those because they enable optical character recognition on the subset of pdfs that are just scans of images (and I am guessing they are fast hopefully).
 
 Also it would be nice to use other binary dependencies that can read pdfs or other types of file from the command line (and have the option to pass in e.g. the current pagenumber).
 

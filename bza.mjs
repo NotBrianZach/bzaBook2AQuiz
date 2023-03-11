@@ -20,8 +20,8 @@ program
   .option("-p, --page <page>", "current page number")
   .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
   .option("-I, --isPDFImage <isPDFImage>", "if pdf is a scanned image w/no searchable text")
-  .option("-C, --character <character>", "character to reply as")
-  .option("-t, --type <type>", "pdf, html")
+  // .option("-C, --character <character>", "character to reply as")
+  .option("-t, --type <type>", "pdf, TODO html")
   .parse(process.argv);
 
 const options = program.opts();
@@ -33,33 +33,6 @@ if (!options.file && typeof options.bookName !== "string") {
 
 const maybeReadingList = parseJSONFromFileOrReturnObjectSync('./readingList.json').readingList;
 const readingList = maybeReadingList === undefined ? {} : maybeReadingList
-
-function writeToReadingList(readOptions) {
-  validateObj(options, "articleType", readingList.articleTypeValues)
-  validateObj(options, "modeValues", readingList.modeValues)
-  if (typeof options.bookName === "string") {
-    //readingList entry exists
-    let readingListEntry = {
-      pageNumber: readOptions.pageNumber || 0,
-      articleType: readOptions.articleType || "",
-      chunkSize: readOptions.chunkSize || 2,
-      narrator: readOptions.narrator || "",
-      summary: readOptions.summary || "",
-      mode: readOptions.mode || "quiz&answer",
-      isPrintSummary: readOptions.isPrintSummary || true,
-      path: readOptions.path || "",
-      max_tokens: readOptions.max_tokens || 2000,
-      executable: readOptions.executable || "xpdf",
-      exeArguments: readOptions.exeArguments || "-z 200",
-      prependContext: readOptions.prependContext || [""],
-      appendContext: readOptions.appendContext || [""]
-    };
-    //write to readingList
-    fs.writeFileSync(`./readingList.json`, JSON.stringify(readingListEntry));
-  } else {
-    console.log("No book name supplied to write list");
-  }
-}
 function removeExtraWhitespace(str) {
   // removes any instance of two or whitespace (text often has tons of padding characers), and whitespace from end and beginning of str
   return str.replace(/\s+/g, " ").trim();
@@ -88,7 +61,7 @@ let readingOpts = {}
 if (existsBookNameInReadingList) {
   title = options.bookName
   readingOpts = {
-    ...readinglistBook
+    ...readingListBook
   }
   currentPageNumber = readingListBook.pageNumber
   chunkSize = readingListBook.chunkSize

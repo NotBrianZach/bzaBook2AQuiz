@@ -56,7 +56,7 @@ export async function queryUser(curPageNum, gptPrompt, queryGPT) {
         pageSlice,
         queryGPT
       );
-      fs.writeFileSync(`./readingList.json`, JSON.stringify(readingListEntry));
+      // fs.writeFileSync(`./readingList.json`, JSON.stringify(readingListEntry));
       return await prompt.get("input most anything to continue");
       break;
     default:
