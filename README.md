@@ -40,11 +40,11 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
   - r="repeat"/continue the conversation, 
   - R="Restart" restart conversation w/only initial prompt
 - MODIFY EVENT LOOP
-  - q="quiz" toggle quiz loop
+  - q="quiz" toggle quiz loop (step 2.a. in Event Loop, prior to Query User, after summaries):
     -  query gpt3 to generate quiz, print quiz, query user for answers
     -  query gpt3 for "grade", explain "wrong" answers
     -  record a log of the quiz&answer
-    -  Query User again
+    -  Query User
 - TOGGLE printing to console
   - h="help" query options
   - p="pageChunkSummary" gpt summary of the last chunk of pages

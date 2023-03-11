@@ -171,6 +171,7 @@ async function eventLoop(pdfTxt, curPageNum, rollingSummary, toggles) {
   //     chunkSize}:`,
   //   rollingSummary
   // );
+  if (toggles.quiz)
 
   queryUser(pdfTxt, curPageNum, rollingSummary, toggles)
 
