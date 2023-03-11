@@ -21,7 +21,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - get $OPENAI_API_KEY key [here](https://platform.openai.com/account/api-keys) if u dont have 
 - `OPENAI_API_KEY=$OPENAI_API_KEY ./bza.mjs -f path_2_ur_pdf_here.pdf`
 - open an issue detailing why doesnt work
-- ELITE HACKER: possibly move readingList.json && logs directory into another directory under source control or cloud backup and create a symlink(s) here pointing to it/them
+- ELITE HACKER: possibly move readingList.json && logs directory into another directory under source control or cloud backup and create a symlink(s) here (under bzabook2aquiz directory) pointing to it/them
 
 ## Event Loop Setup: 
 0. - IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
