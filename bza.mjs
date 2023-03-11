@@ -53,6 +53,7 @@ const logs = {
 }
 
 const readingListBook = readingList[options.bookName]
+console.log("readingListBook", readingListBook)
 const existsBookNameInReadingList = readingListBook !== undefined
 let currentPageNumber = options.page === undefined ? 0 : options.page
 let chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize
@@ -63,11 +64,6 @@ if (existsBookNameInReadingList) {
   readingOpts = {
     ...readingListBook
   }
-  currentPageNumber = readingListBook.pageNumber
-  chunkSize = readingListBook.chunkSize
-  title = options.bookName
-  options.file = readingListBook.path
-  synopsis = readingListBook.summary
 } else {
   var titlePromptSchema = {
     properties: {
@@ -95,13 +91,15 @@ if (existsBookNameInReadingList) {
 
 //   - ask user for input
 
-async function eventLoop(pdfTxt, curPageNum, rollingSummary, toggles) {
+async function eventLoop(pdfTxt, readOpts) {
   const totalPages = pdfTxt.text_pages.length;
-  console.log("totalPages", totalPages, currentPageNumber, chunkSize);
+  const pageNum = readOpts.pageNumber
+  const chunkSize = readOpts.chunkSize
+  console.log("totalPages, pageNum, chunkSize", totalPages, readOpts.pageNumber, readOpts.chunkSize);
   // 1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
   const pageSlice = removeExtraWhitespace(
     pdfTxt.text_pages
-      .slice(curPageNum, curPageNum + chunkSize)
+      .slice(pageNum, pageNum + chunkSize)
       .join("")
   );
   const chunkSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
@@ -110,41 +108,50 @@ async function eventLoop(pdfTxt, curPageNum, rollingSummary, toggles) {
   const newRollingSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT with respect to the rest of the book, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
   if (toggles.isPrintPage) {
     console.log(
-      `Summary of pages ${curPageNum} to ${curPageNum +
+      `Summary of pages ${pageNum} to ${pageNum +
         chunkSize}:`,
       rollingSummary
     );
   }
   if (toggles.isPrintChunkSummary) {
     console.log(
-      `Summary of pages ${curPageNum} to ${curPageNum +
+      `Summary of pages ${pageNum} to ${pageNum +
         chunkSize}:`,
       rollingSummary
     );
   }
   if (toggles.isPrintRollingSummary) {
     console.log(
-      `Summary of pages ${curPageNum} to ${curPageNum +
+      `Summary of pages ${pageNum} to ${pageNum +
         chunkSize}:`,
       rollingSummary
     );
   }
   // console.log(
-  //   `Summary of pages ${curPageNum} to ${curPageNum +
+  //   `Summary of pages ${pageNum} to ${pageNum +
   //     chunkSize}:`,
   //   rollingSummary
   // );
   const { quiz, grade } = await runQuiz(title, synopsis, pageSlice, queryGPT)
   fs.writeFileSync()
-  queryUser(pdfTxt, curPageNum, rollingSummary, toggles)
+  queryUser(pdfTxt, pageNum, rollingSummary, toggles)
 
     // console.log(`New Meta Summary:`, synopsis);
-  if (curPageNum + chunkSize < totalPages) {
+  if (pageNum + chunkSize < totalPages) {
     // logSummary.push(rollingSummary);
-    return eventLoop(pdfTxt, curPageNum + chunkSize, newRollingSummary, step1a, step1b, step2a, step4a)
+    return eventLoop(pdfTxt, {
+      ...readOpts,
+      pageNum: pageNum + chunkSize
+    })
   } else {
     console.log(logs);
     // 4. record a log of all the summaries and quizzes
+    const nowTime = new Date()
+    // TODO make subdirectory for ${title}
+    fs.writeFileSync("./logs/${nowtime}-${title}", JSON.stringify({
+      logs,
+      readOpts
+    }))
   }
 }
 
@@ -182,5 +189,5 @@ if (!options.isPdfImage || options.isPdfImage === undefined) {
 
 processor.on("complete", async function(pdfText) {
   const toggles = {}
-  eventLoop(pdfTxt, currentPageNumber, "", toggles)
+  eventLoop(pdfTxt, currentPageNumber, "", readingOpts)
 });

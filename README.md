@@ -36,7 +36,8 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 5. parting thoughts from gpt3, call onExit method (cleanup)
 
 ## Query User:
-- C=continue to next pageChunk,
+- C="Continue" to next pageChunk,
+- X="eXit" exit program, saving logs
 - ASK user for input
   - r="repeat"/continue the conversation, 
   - R="Restart" restart conversation w/only initial prompt
