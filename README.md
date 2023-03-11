@@ -12,7 +12,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 
 ## To Run
 - if windows then install windows subsystem for linux 
-- install [the nix package manager](https://nixos.org/download.html) (select appropriate operating system from siderbar)
+- install [the nix package manager](https://nixos.org/download.html) (select appropriate operating system from sidebar)
 - install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - `git clone https://github.com/NotBrianZach/bzabook2aquiz.git`
 - `cd bzabook2aquiz`
