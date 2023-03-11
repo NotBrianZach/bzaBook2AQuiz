@@ -23,55 +23,45 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - open an issue detailing why doesnt work
 - ELITE HACKER: possibly move readingList.json && logs directory into another directory under source control or cloud backup and create a symlink(s) here pointing to it/them
 
-## How to Read Event Loop & Workflows
-- numbers are steps in the event loop, letters are steps in a given workflow (which modifies event loop)
-- a.1 -> step a happens before step 1, but after step 0
-- 1.a -> step 1 happens before step a
-- 1.b -> step 1 happens before step a, step b happens after step a
-- (currently unused) 1-a -> step 1 happens concurrently/asynchronously with step a 
-
 ## Event Loop Setup: 
 0. - IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
    - ELSE prompt user for title&synopsis/summary, and get pageNumber&chunkSize from commandline params or defaults (0,2)
    - finally initialize rollingSummary=empty string
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
 1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
-2. query user w/default options, 
-3. send query to gpt3&print response,
-4. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
-5. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 4.
-6. parting thoughts from gpt3, call onExit method (cleanup)
+2. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
+3. Query User(title, synopsis, pageNumber pageChunkSummary, rollingSummary, toggles) 
+4. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 5.
+5. parting thoughts from gpt3, call onExit method (cleanup)
 
-## User Query (default):
+## Query User:
 - C=continue to next pageChunk,
-- ask user for input
+- ASK user for input
   - r="repeat"/continue the conversation, 
-    - append next user query to prompt 
-    - send prompt to gpt3 (if empty user query, acts as repeat)
-    - wait for further user input
-  - Q=ask a different query w/current context 
-- modify what prints out
-  - h="help" toggle printing query options
-  - R="rollingSummary" toggle printing rollingSummary 
-  - p="pageChunkSummary" toggle printing pageChunkSummary
-- modify all non summary gpt queries going forward
+  - R="Restart" restart conversation w/only initial prompt
+- MODIFY EVENT LOOP
+  - q="quiz" toggle quiz loop
+   -  query gpt3 to generate quiz, print quiz, query user for answers
+   -  query gpt3 for "grade", explain "wrong" answers
+   -  record a log of all the summaries and quizzes 
+   -  Query User again
+- TOGGLE printing to console
+  - h="help" query options
+  - p="pageChunkSummary" gpt summary of the last chunk of pages
+  - S="Summary" gpt summary of everything up to this point
+  - N= "Narration" rewrite all output in the voice of a character
+  - V= TODO "Voice Output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
+  - v= TODO "Voice Input"  use ?talon? to allow voice input
+- MODIFY PROMPT: change all non-summary gpt queries going forward
   - b="before" prepend next user query input
     - "tell a joke about the following text:" 
   - d=delete stack of prepended prompts
   - A="after" append next user query input to all non summary gpt requests
     - "...tell another joke about the above text that ties into the first joke" 
   - D=delete stack of appended prompts
-  - t=change response length/max token count (default 2000, max = 4096 includes prompt)
-- TODO
-  - Narration toggle: rewrite all output in the voice of a character
-  - Voice Output toggle: use [TTS](https://github.com/coqui-ai/TTS) to generate voice to narrate gpt response & queries to user
-  - Voice Input Toggle: use talon to allow voice input?
-  - (not sure how want to implement, probably not in loop) Narrate Title & Summary toggle: 1.a also rewrite the title & summary in character voice prior to all other queries (after user has confirmed them)
+  - l="length" change response length/max token count (default 2000, max = 4096 includes prompt)
 
 ## Quiz Workflow (Default):
-- 1.a. query gpt3 to generate quiz, print quiz, query user for answers
-- 1.b. query gpt3 for "grade", explain "wrong" answers
-- 1.c. record a log of all the summaries and quizzes 
 
 ## Options & Defaults (readingList.json): 
 - Article format: [pdf, html, epub]

@@ -4,6 +4,7 @@ import fs from "fs";
 import prompt from "prompt";
 import pdf_extract from "pdf-extract";
 import {createGPTQuery} from "./lib/createGPTQuery.mjs"
+import queryUser from "./lib/queryUser.mjs"
 import path from "path"
 console.log(process.argv);
 
@@ -18,10 +19,8 @@ program
   .option("-p, --page <page>", "current page number")
   .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
   .option("-I, --isPDFImage <isPDFImage>", "if pdf is a scanned image w/no searchable text")
-  // .option("-b, --before <beforeContext>", "context provided to gpt at beginning of each request")
-  // .option("-a, --after <afterContext>", "context provide to llm at end of each request")
   .option("-C, --character <character>", "character to reply as")
-//TODO .option("-t, --type <type>", "pdf, html")
+  .option("-t, --type <type>", "pdf, html")
   .parse(process.argv);
 
 const options = program.opts();
@@ -69,7 +68,6 @@ function writeToReadingList(readOptions) {
     console.log("No book name supplied to write list");
   }
 }
-let beforeContext = options.beforeContext
 function removeExtraWhitespace(str) {
   // removes any instance of two or whitespace (text often has tons of padding characers), and whitespace from end and beginning of str
   return str.replace(/\s+/g, " ").trim();
@@ -134,106 +132,39 @@ if (existsBookNameInReadingList) {
 
 //   - ask user for input
 
-// title, synopsis, pageSlice, bodyTxt, rollingSummary
-async function queryUserDefault(title, synopsis, bodyTxt, pageSlice, rollingSummary, gptPrompt) {
-  const modifiedDefaultQuerySchema =  {
-    properties: {
-      nextAction: {
-        type: 'string', // Specify the type of input to expect.
-        message:
-        `
-- C=continue to next pageChunk,\n
-- ask user for input\n
-  - r="repeat"/continue the conversation,\n
-    - append next user query to prompt\n
-    - send prompt to gpt3 (if empty user query, acts as repeat)\n
-    - wait for further user input\n
-  - Q=ask a different query w/current context\n
-- modify what prints out\n
-  - h="help" toggle printing query options\n
-  - R="rollingSummary" toggle printing rollingSummary\n
-  - p="pageChunkSummary" toggle printing pageChunkSummary\n
-- modify all non summary gpt queries going forward\n
-  - b="before" prepend next user query input\n
-    - "tell a joke about the following text:"\n
-  - d=delete stack of prepended prompts\n
-  - A="after" append next user query input to all non summary gpt requests\n
-    - "...tell another joke about the above text that ties into the first joke"\n
-  - D=delete stack of appended prompts\n
-  - t=change response length/max token count (default 2000, max = 4096 includes prompt)\n
-        `
-      }
-    }
-  }
-  const queryValue = await prompt.get(queryUserDefault("",false));
-  let query = ""
-  let gptResponse = ""
-  switch(queryValue) {
-    // - ask user for input
-    case "r":
-    //   - r="repeat"/continue the conversation,
-    //   - append next user query to prompt
-    //   - send prompt to gpt3 (if empty user query, acts as repeat)
-    //   - wait for further user input
-      nextUserQuery = await prompt(["nextUserQuery"])
-      const nextUserQueryPrompt = `${gptPrompt}\n${nextUserQuery}`
-      console.log("nextUserQueryPrompt:", nextUserQueryPrompt)
-      gptResponse = queryGPT(nextUserQueryPrompt)
-      console.log("gptResponse", gptResponse)
-      return queryUserDefault(optionToAdd, isPrepend, gptResponse)
-    case "Q":
-      query = await prompt(["query"])
-      gptResponse = queryGPT(`${gptPrompt}`)
-      return queryUserDefault(optionToAdd, isPrepend, gptPrompt)
-
-    // - modify what prints out
-    // - h="help" toggle printing query options
-    // - R="rollingSummary" toggle printing rollingSummary
-    // - p="pageChunkSummary" toggle printing pageChunkSummary
-    // - modify all non summary gpt queries going forward
-    // - b="before" prepend next user query input
-    // - "tell a joke about the following text:"
-    // - d=delete stack of prepended prompts
-    // - A="after" append next user query input to all non summary gpt requests
-    // - "...tell another joke about the above text that ties into the first joke"
-    // - D=delete stack of appended prompts
-    // - t=change response length/max token count (default 2000, max = 4096 includes prompt)
-    // b="before" prepend next user query input to all non summary gpt requests, "tell a joke about the following text":\n
-    // d=delete stack of prepended prompts
-    // A="after" append next user query input to all non summary gpt requests,"...tell another joke about the above text that ties into the first joke"
-    // D=delete stack of appended prompts
-    default:
-      // case C returns C here
-      return queryValue
-  }
-}
-
-async function eventLoop(pdfTxt, curPageNum, rollingSummary,  step1a, step1b, step2a, step4a) {
+async function eventLoop(pdfTxt, curPageNum, rollingSummary, toggles) {
   const totalPages = pdfTxt.text_pages.length;
   console.log("totalPages", totalPages, currentPageNumber, chunkSize);
-  // 1. feed gpt3 pages[pageNumber:pageNumber+chunkSize], prepending prependContext&synopsis&title&rollingSummary, appending appendContext, summarize pages[n:n+m]
+  // 1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
   const pageSlice = removeExtraWhitespace(
     pdfTxt.text_pages
       .slice(curPageNum, curPageNum + chunkSize)
       .join("")
   );
-  const pageChunkSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
+  const chunkSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
 
-  let step1aOut = ""
-  if (step1a !== undefined) {
-    step1aOut = await step1a(title, synopsis, pageSlice, pdfTxt, rollingSummary)
-  }
-  let step1bOut = ""
-  if (step1b !== undefined && step1aOut !== "C") {
-    step1bOut = step1b(title, synopsis, pageSlice, pdfTxt, rollingSummary)
-  }
-  queryUserDefault(optionToAdd, isPrepend, curPageNum, gptPrompt)
-  // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
+  // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
   const newRollingSummary = queryGPT(`Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT with respect to the rest of the book, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`)
-
-  let step2aOut = ""
-  if (step2a !== undefined && step1aOut !== "C" && step2aOut !== "C") {
-    step2aOut = step2a(title, synopsis, pageSlice, pdfTxt, rollingSummary)
+  if (toggles.isPrintPage) {
+    console.log(
+      `Summary of pages ${curPageNum} to ${curPageNum +
+        chunkSize}:`,
+      rollingSummary
+    );
+  }
+  if (toggles.isPrintChunkSummary) {
+    console.log(
+      `Summary of pages ${curPageNum} to ${curPageNum +
+        chunkSize}:`,
+      rollingSummary
+    );
+  }
+  if (toggles.isPrintRollingSummary) {
+    console.log(
+      `Summary of pages ${curPageNum} to ${curPageNum +
+        chunkSize}:`,
+      rollingSummary
+    );
   }
   // console.log(
   //   `Summary of pages ${curPageNum} to ${curPageNum +
@@ -241,8 +172,9 @@ async function eventLoop(pdfTxt, curPageNum, rollingSummary,  step1a, step1b, st
   //   rollingSummary
   // );
 
-    // const newRollingSummary = queryGPT(`given $SUMMARY$ of book titled ${title.titleKey}${synopsis} $CONTENT$: ${pageSlice} $INSTRUCTIONS$: given $SUMMARY$ and $CONTENT$ of book titled "${title}" summarise the book up to this point $CONTENT$`)
-  // 3. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 4.
+  queryUser(pdfTxt, curPageNum, rollingSummary, toggles)
+
+
     // console.log(`New Meta Summary:`, synopsis);
   if (curPageNum + chunkSize < totalPages) {
     // logSummary.push(rollingSummary);
@@ -250,39 +182,9 @@ async function eventLoop(pdfTxt, curPageNum, rollingSummary,  step1a, step1b, st
   } else {
     console.log(logs);
     // 4. record a log of all the summaries and quizzes
-    let step4aOut = ""
-    if (step4a !== undefined) {
-      step4aOut = step4a(title, synopsis, pageSlice, pdfTxt, rollingSummary)
-      // step6a(logs)
-    }
   }
 }
 
-async function runQuizWorkflow(pdfTxt, synopsis, title) {
-  async function runQuiz(title, synopsis, pageSlice) {
-    // * 1.a. generate quiz,
-    const quiz =  await queryGPT(`INSTRUCTIONS: given SUMMARY and CONTENT of book titled "${title}" generate a quiz bank of questions to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice}`)
-    console.log(`Quiz:`, quiz);
-    // logQuiz.push(quiz);
-    // const queryUserDefault("q", true)
-    const { answers } = await prompt.get(
-      {
-        properties: {
-          answers: {
-            message:
-            "Enter Answers",
-            required: true
-          }
-        }
-      });
-    const grade =  await queryGPT(`assign a grade in format { grade: x, question1: ["correct", ""], "question2": ["wrong", "correct answer goes here"], ... }, given {SUMMARY} and {CONTENT} of book titled "${title}" to {student answers} to a {QUIZ} to test knowledge of CONTENT, SUMMARY: ${synopsis} CONTENT$: ${pageSlice} {QUIZ}: quiz {STUDENT ANSWERS}: ${answers}`)
-    console.log("grade", grade)
-    return await prompt.get("input most anything to continue")
-  }
-
-  // pdfTxt, curPageNum, rollingSummary,  step1a, step1b, step2a, step4a
-  eventLoop(pdfTxt, currentPageNumber, "", runQuiz)
-}
 
 if (!options.isPdfImage || options.isPdfImage === undefined) {
   // extract text from pdf with searchable text
@@ -316,7 +218,6 @@ if (!options.isPdfImage || options.isPdfImage === undefined) {
 }
 
 processor.on("complete", async function(pdfText) {
-  switch(options.workflow) {
-    default: runQuizWorkflow(pdfText, synopsis, title)
-  }
+  const toggles = {}
+  eventLoop(pdfTxt, currentPageNumber, "", toggles)
 });
