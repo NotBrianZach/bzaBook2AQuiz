@@ -4,7 +4,7 @@ Interactive books. Books sliced up like pizza. Book pizza. Bza.
 
 It takes a pdf, or in the future maybe webpages or epubs, and feeds it a few pages at a time into a ai chatbot, then outputs something, for example, a quiz on the topic of the pages it read and then waits for some form of user input to tell it to, for example, continue on or record the quiz results.
 
-Thus it could potentially provide a way to read more actively. 
+Thus it could provide a way to read more actively. 
 
 By logging the conversation onto the file system it could facilitate spaced repetition of read content.
 

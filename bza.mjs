@@ -5,6 +5,7 @@ import prompt from "prompt";
 import pdf_extract from "pdf-extract";
 import {createGPTQuery} from "./lib/createGPTQuery.mjs"
 import queryUser from "./lib/queryUser.mjs"
+import runQuiz from "./lib/runQuiz.mjs"
 import path from "path"
 console.log(process.argv);
 
@@ -128,8 +129,6 @@ if (existsBookNameInReadingList) {
   readingOpts = { ...readingList.readingOptsDefaults}
 }
 
-// fs.writeFileSync()
-
 //   - ask user for input
 
 async function eventLoop(pdfTxt, curPageNum, rollingSummary, toggles) {
@@ -171,10 +170,9 @@ async function eventLoop(pdfTxt, curPageNum, rollingSummary, toggles) {
   //     chunkSize}:`,
   //   rollingSummary
   // );
-  if (toggles.quiz)
-
+  const { quiz, grade } = await runQuiz(title, synopsis, pageSlice, queryGPT)
+  fs.writeFileSync()
   queryUser(pdfTxt, curPageNum, rollingSummary, toggles)
-
 
     // console.log(`New Meta Summary:`, synopsis);
   if (curPageNum + chunkSize < totalPages) {
