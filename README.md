@@ -25,7 +25,8 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 
 ## Event Loop Setup: 
 0. - IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
-   - ELSE prompt user for title&synopsis/summary, and get pageNumber&chunkSize from commandline params or defaults (0,2)
+   - ELSE prompt user for title&synopsis, and get pageNumber&chunkSize from commandline params or defaults (0,2)
+     - you can, for example, have gpt make a synopsis for you by copy pasting abstract or table of contents into e.g. openai playground and prompting it to summarize said abstract or table of contents
    - finally initialize rollingSummary=empty string
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
 1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)

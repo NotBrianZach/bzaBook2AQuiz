@@ -3,20 +3,20 @@ import { program, Option } from "commander";
 import fs from "fs";
 import prompt from "prompt";
 import pdf_extract from "pdf-extract";
-import {createGPTQuery} from "./lib/createGPTQuery.mjs"
 import queryUser from "./lib/queryUser.mjs"
 import runQuiz from "./lib/runQuiz.mjs"
+import { parseJSONFromFileOrReturnObjectSync, validateObj } from "./lib/utils.mjs"
 import path from "path"
+
 console.log(process.argv);
-
-
+import {createGPTQuery} from "./lib/createGPTQuery.mjs"
 const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY)
 
 program
   .version("0.1.0")
   .option("-f, --file <file>", "Path to file to read from")
   .addOption(new Option("-b, --bookName <bookName>", "Book name (alternative to file)").conflicts("file"))
-  .option("-O, --openAIAPIKey <openAIAPIKey>", "api key")// .env("openAIAPIKey")
+  // .option("-O, --openAIAPIKey <openAIAPIKey>", "api key")// .env("openAIAPIKey")
   .option("-p, --page <page>", "current page number")
   .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
   .option("-I, --isPDFImage <isPDFImage>", "if pdf is a scanned image w/no searchable text")
@@ -27,21 +27,12 @@ program
 const options = program.opts();
 console.log(options);
 if (!options.file && typeof options.bookName !== "string") {
-  console.error("No file specified e.g. ./Frankenstein.pdf");
+  console.error("No file or bookName specified e.g. -f ./Frankenstein.pdf, -b Frankenstein");
   process.exit(1);
 }
 
-function parseJSONFile(filepath) {
-  return JSON.parse(fs.readFileSync(filepath), {encoding:'utf8', flag:'r'})
-}
-const readingList = parseJSONFile('./readingList.json').readingList;
-
-function validateObj(object, key, values) {
-  if (object[key] && values.includes(object[key])) {
-    return true;
-  }
-  return false;
-}
+const maybeReadingList = parseJSONFromFileOrReturnObjectSync('./readingList.json').readingList;
+const readingList = maybeReadingList === undefined ? {} : maybeReadingList
 
 function writeToReadingList(readOptions) {
   validateObj(options, "articleType", readingList.articleTypeValues)

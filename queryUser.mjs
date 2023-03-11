@@ -10,7 +10,7 @@ export async function queryUser(curPageNum, gptPrompt, queryGPT) {
         description: `
 - C=continue to next pageChunk,\n
 - ask user for input\n
-  - r="repeat"/continue the conversation,\n
+  - r="repeat" continue the conversation,\n
   - R="Restart" restart conversation with only initial prompt\n
 - toggle workflows/subloops\n
   - q="quiz" quiz\n
@@ -50,6 +50,13 @@ export async function queryUser(curPageNum, gptPrompt, queryGPT) {
       queryUser(curPageNum, gptPrompt, queryGPT);
       break;
     case "q":
+      const { quiz, grade } = await runQuiz(
+        title,
+        synopsis,
+        pageSlice,
+        queryGPT
+      );
+      fs.writeFileSync(`./readingList.json`, JSON.stringify(readingListEntry));
       return await prompt.get("input most anything to continue");
       break;
     default:
