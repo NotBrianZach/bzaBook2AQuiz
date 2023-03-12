@@ -6,7 +6,7 @@ It feeds a pdf, webpage, or epub a few (chunkSize) pages at a time into chatgpt 
 
 then outputs something, for example, a quiz on the topic of the pages it read 
 
-then waits for user input to tell it to, for example, continue on, and maybe then tell a joke or make a short story about it, or translate into spanish. lots of possibilities.  
+then waits for user input to tell it to what to do next with the pageChunk before continuing the: it could tell a joke, respond with a parable, or translate into spanish. lots of possibilities.  
 
 This makes for a more active form of reading, 
 
