@@ -18,9 +18,10 @@ pkgs.stdenv.mkDerivation {
   buildInputs = [
     pkgs.nodejs
 
-    # reading list util
-    pkgs.jq
-
+    # command line epub reader
+    pkgs.epr
+    # pkgs.xpdf marked insecure
+    pkgs.mupdf
 
     # all binary requirements of pdf-extract npm package
     pdftk
@@ -28,4 +29,9 @@ pkgs.stdenv.mkDerivation {
     ghostscript
     tesseractjs
   ];
+
+  shellHook = ''
+    alias bza=$(pwd)/bza.mjs
+    bza --help
+  '';
 }

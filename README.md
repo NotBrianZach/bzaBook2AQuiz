@@ -2,7 +2,7 @@
 
 Interactive books. Books sliced up like pizza. Book pizza. Bza.
 
-It feeds a pdf, webpage, or epub a few pages at a time into chatgpt or another LLM,
+It feeds a pdf, webpage, or epub a few (chunkSize) pages at a time into chatgpt or another LLM,
 
 then outputs something, for example, a quiz on the topic of the pages it read 
 
@@ -21,7 +21,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - `nix-shell`
 - `npm install`
 - get $OPENAI_API_KEY key [here](https://platform.openai.com/account/api-keys) if u dont have 
-- `OPENAI_API_KEY=$OPENAI_API_KEY ./bza.mjs -f path_2_ur_pdf_here.pdf`
+- `OPENAI_API_KEY=$OPENAI_API_KEY ./bza.sh -f path_2_ur_pdf_here.pdf`
 - open an issue detailing why doesnt work
 - ELITE HACKER: possibly move readingList.js && logs directory into another directory under source control or cloud backup and create a symlink(s) here (under bzabook2aquiz directory) pointing to it/them
 

@@ -90,22 +90,5 @@ export default {
       prependContext: [""],
       appendContext: [""]
     }
-  },
-  readingOptsDefaults: {
-    pageNumber: 0,
-    articleType: "book",
-    chunkSize: 2,
-    narrator: "Mr. T",
-    synopsis: "",
-    isPrintPage: false,
-    isPrintPageChunkSummary: "",
-    isPrintRollingSummary: "",
-    mode: "quiz",
-    path: "./Frankenstein.pdf",
-    max_tokens: 2000,
-    executable: "xpdf",
-    exeArguments: "-z 200",
-    prependContext: [""],
-    appendContext: [""]
   }
 };

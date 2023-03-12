@@ -2,6 +2,10 @@
   "modeValues": ["quiz", "query"],
   "articleTypes": ["book", "research paper", ""],
   "fileTypes": ["pdf", "url", "epub"],
+  "readers": { "pdf": { "command": "mupdf", "args": "-Y 2" },
+               "html": {},
+               "epub": {}
+             },
   "exampleCharacterValues": ["", "socrates", "lao-tzu", "mike tyson"],
   "defaults": {
     "pageNumber": 0,

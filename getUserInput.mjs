@@ -2,7 +2,7 @@ import prompt from "prompt";
 import runQuiz from "./lib/runQuiz.mjs";
 import fs from "fs";
 //   - ask user for input
-export async function getUserInput(curPageNum, gptPrompt, queryGPT) {
+export default async function getUserInput(curPageNum, gptPrompt, queryGPT) {
   const defaultQuerySchema = {
     properties: {
       nextAction: {
@@ -42,12 +42,12 @@ export async function getUserInput(curPageNum, gptPrompt, queryGPT) {
       query = await prompt(["query"]);
       gptResponse = queryGPT(`${gptPrompt}\n${query}`);
       console.log("gptResponse", gptResponse);
-      queryUser(curPageNum, gptResponse, queryGPT);
+      getUserInput(curPageNum, gptResponse, queryGPT);
       break;
     case "R":
       query = await prompt(["query"]);
       gptResponse = queryGPT(`${gptPrompt}`);
-      queryUser(curPageNum, gptPrompt, queryGPT);
+      getUserInput(curPageNum, gptResponse, queryGPT);
       break;
     case "q":
       const { quiz, grade } = await runQuiz(
