@@ -14,7 +14,7 @@ and generates bookmarks and a bunch of other information as well, see readingLis
 
 Could also be thought of as a reading buddy, summarizer or customizable narrator/reteller. 
 
-## To Run
+## To Run (TODO)
 - if windows then install windows subsystem for linux 
 - install [the nix package manager](https://nixos.org/download.html) (select appropriate operating system from sidebar)
 - install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
@@ -24,6 +24,8 @@ Could also be thought of as a reading buddy, summarizer or customizable narrator
 - `npm install`
 - get $OPENAI_API_KEY key [here](https://platform.openai.com/account/api-keys) if u dont have 
 - `OPENAI_API_KEY=$OPENAI_API_KEY bza -f path_2_ur_pdf_here.pdf`
+- or (TODO)
+- `OPENAI_API_KEY=$OPENAI_API_KEY bza -w https://www.reddit.com/r/WritingPrompts/comments/5uilpw/wp_the_year_is_1910_adolf_hitler_a_struggling/`
 - open an issue detailing why doesnt work
 - ELITE HACKER: possibly move readingList.js && logs directory into another directory under source control or cloud backup and create a symlink(s) here (under bzabook2aquiz directory) pointing to it/them
 
@@ -33,34 +35,34 @@ Could also be thought of as a reading buddy, summarizer or customizable narrator
      - you can, for example, have gpt make a synopsis for you by copy pasting abstract or table of contents into e.g. openai playground and prompting it to summarize said abstract or table of contents
    - finally initialize rollingSummary="this is the start of the document"
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
-pageChunk = pages[pageNumber:pageNumber+chunkSize]
+const pageChunk = pages[pageNumber:pageNumber+chunkSize]
 1. pageChunkSummary=queryGPT(summarize pageChunk given title+synopsis+rollingSummary)
 2. get User Input, act on input 
-3. rollingSummary=queryGPT3(further contextualize pageChunk with respect to rest of book, this will act as a summary of previous pages for next pageChunk)
+3. rollingSummary=queryGPT3(further contextualize pageChunk with respect to rest of book, this will act as a summary of previous pages for next pageChunkSummary)
 4. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 5.
 5. parting thoughts from gpt3, call onExit method (cleanup)
 
 ## User Input:
 - c="continue" to next pageChunk,
-- j="jump" to user input pageNumber,
-- X="eXit" exit program, saving logs
+- j="jump" to input pageNumber,
+- EX="EXit" exit program, saving logs
 - ASK user for input
   - r="repeat" ask user for input, then append to prompt and query gpt, 
-  - R="Restart" restart conversation w/only initial prompt
-- EVENT LOOP MODIFICATON TOGGLES
+  - RE="REstart" restart conversation w/only initial prompt
+- EVENT LOOP TOGGLES
   - q="quiz" quiz loop (step 1.a. in Event Loop, prior to User Input, after summaries):
     -  query gpt3 to generate quiz, print quiz, query user for answers
     -  query gpt3 for "grade", explain "wrong" answers
     -  save a log of the quiz&answer
     -  get User Input
-- TOGGLEs print to console, and enable/disable printing in event loop
+- PRINT TOGGLES: print to console, and enable/disable printing in event loop
   - h="help" query options
   - s="summary of page chunk" gpt summary of the last chunk of pages
   - S="rolling Summary" gpt summary of everything up to this point (short term memory)
   - N= "Narration" rewrite all output in the voice of a character
   - V= TODO "Voice output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
   - v= TODO "voice input"  use ?talon? to allow voice input
-- MODIFY LLM PROMPT: change all non-summary llm queries going forward
+- LLM PROMPT MODIFICATION: change all non-summary llm queries going forward
   - b="before" prepend next user query input
     - "tell a joke about the following text:" 
   - d=delete stack of prepended prompts
@@ -69,13 +71,12 @@ pageChunk = pages[pageNumber:pageNumber+chunkSize]
   - D="Delete" stack of appended prompts
   - l="length" change response length/max token count (default 2000, max = 4096 includes prompt)
 
+## Command Line Meta Commands (bza)
+- initDB, idempotent, triggered by nix-shell
+- deleteDB you probably dont want to do this
+- resumeFromLog
 ## Options & Defaults: 
-Please see the readingList.js for available options
 
-## Reading List Utility (bza.sh)
-- store path to pdf and relevant executable to read it
-- backup & rotate logs
-- restore from logs
 
 ## Design Decisions
 pdf-extract introduces a bunch of binary dependencies relative to alternative libraries but we want those because they enable optical character recognition on the subset of pdfs that are just scans of images (and I am guessing they are fast hopefully).

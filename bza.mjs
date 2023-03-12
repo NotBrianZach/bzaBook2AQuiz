@@ -11,19 +11,97 @@ import eventLoop from "./eventLoop.mjs";
 // could also use https://github.com/mozilla/readability
 // There is also an alias to `convert` called `htmlToText`.
 import { htmlToText } from "html-to-text";
+import Database from "better-sqlite3";
+
 import axios from "axios";
 const htmlToTxtOpts = {
   wordwrap: 130
 };
 
 program
-  .command("bookmarks")
-  .description("print readingList titles")
+  .command("b")
+  .description("boookmarks")
   .action(() => {
     // console.log(Object.keys(readingList).map((val, tit) => tit));
-    console.log(Object.keys(readingList).map((title) =>
-      ({title, pageNumber: readingList[title].pageNumber})
-                                            ));
+    // TODO replace with sequel query
+    console.log(
+      Object.keys(readingList).map(title => ({
+        title,
+        pageNumber: readingList[title].pageNumber
+      }))
+    );
+  });
+
+program
+  .command("initDB")
+  .description('initialize "bookmark" database idempotently')
+  .action(() => {
+    // console.log(Object.keys(readingList).map((val, tit) => tit));
+    const db = new Database("./bookmarks.sq3", {
+      // fileMustExist: true,
+      timeout: 2000 // 2 seconds
+      // verbose: sqlstatement => console.log(`sqlite3 trace ${sqlstatement}`)
+    });
+    db.pragma("journal_mode = WAL");
+
+    const dbDelete = db.prepare("drop tables");
+    dbDelete.run();
+  });
+
+program
+  .command("initDB")
+  .description('initialize "bookmark" database idempotently')
+  .action(() => {
+    // console.log(Object.keys(readingList).map((val, tit) => tit));
+    const db = new Database("./bookmarks.sq3", {
+      // fileMustExist: true,
+      timeout: 2000 // 2 seconds
+      // verbose: sqlstatement => console.log(`sqlite3 trace ${sqlstatement}`)
+    });
+    db.pragma("journal_mode = WAL");
+
+    const dbBookmarks = db.prepare(
+      "create table if not exists bookmarks (bTitle TEXT primary key, title TEXT not null default '', synopsis TEXT not null default '', pageNumber INTEGER not null default 0, isQuiz boolean default false, isPrintPage boolean default false, isPrintChunkSummary boolean default false, chunkSize INTEGER not null default 2, maxTokens INTEGER not null default 2000, narrator TEXT, last_read_tstamp TEXT)"
+    );
+    // articleType: "",
+    dbBookmarks.run();
+
+    const dbContexts = db.prepare(
+      `create table if not exists contexts (bTitle TEXT primary key,
+        order int not null,
+        prepend text not null default '',
+        append text not null default '',
+        prependSummary text not null default '',
+        appendSummary text not null default '' primary key(bTitle, order))`
+    );
+    dbContexts.run();
+    const dbPDFs = db.prepare(
+      "create table if not exists pdfs (bTitle TEXT primary key, readerExe text not null default 'mupdf', readerArgs not null default '-Y 2', isImage boolean)"
+    );
+    dbPdfs.run();
+    const dbHTML = db.prepare(
+      "create table if not exists pdfs (bTitle TEXT primary key, readerExe text not null default 'chromium', readerArgs not null default '-Y 2', isImage boolean)"
+    );
+    dbHTML.run();
+    const dbLogging = db.prepare(
+      "create table if not exists logs (btitle TEXT not null primaryKey, pageNumber INTEGER, msg TEXT not null default, timestamp TEXT)"
+    );
+    dbLogging.run();
+
+    // title: "",
+    // synopsis: "",
+    // pageChunk: {},
+    // pageChunkSummary: {},
+    // rollingSummary: {},
+    // quizzes: {
+    //   "0-2": {
+    //     questions: "",
+    //     answers: "",
+    //     readingList: {}
+    //   }
+    // }
+
+    console.log("initialized database");
   });
 
 // .option("-C, --character <character>", "character to reply as")
@@ -77,20 +155,7 @@ program
       process.exit(1);
     }
 
-    const logs = {
-      title: "",
-      synopsis: "",
-      pageChunk: {},
-      pageChunkSummary: {},
-      rollingSummary: {},
-      quizzes: {
-        "0-2": {
-          questions: "",
-          answers: "",
-          readingList: {}
-        }
-      }
-    };
+    const logs = {};
 
     const readingListBook = readingList[options.bookName];
     console.log("readingListBook", readingListBook);
@@ -243,5 +308,22 @@ program
         console.error("no filetype or url specified or inferrable");
     }
   });
+
+import Database from "better-sqlite3";
+const db = new Database(process.env.DB_PATH, {
+  // fileMustExist: true,
+  timeout: 5000, // 5 seconds
+  verbose: sqlstatement => console.log(`sqlite3 trace ${sqlstatement}`)
+});
+db.pragma("journal_mode = WAL");
+
+// "CREATE TABLE IF NOT EXISTS shopDetails (optimalNumDogs INTEGER not null default 17, shopPassword TEXT not null default 'playingBoxesYellow', homeDir TEXT not null default '/home/zach/poinkare', woofsURL TEXT not null default 'woofspetsalon.com')"
+const stmt = db.prepare(
+  "create table if not exists msgLog (phoneNum TEXT not null default, msg TEXT not null default, timestamp TEXT)"
+);
+
+stmt.run();
+
+module.exports = db;
 
 program.parse(process.argv);

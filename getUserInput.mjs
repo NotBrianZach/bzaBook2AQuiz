@@ -38,6 +38,9 @@ export default async function getUserInput(curPageNum, gptPrompt, queryGPT) {
   let query = "";
   let gptResponse = "";
   switch (queryValue) {
+    case "c":
+      return queryValue;
+      break;
     case "r":
       query = await prompt(["query"]);
       gptResponse = queryGPT(`${gptPrompt}\n${query}`);
@@ -60,7 +63,6 @@ export default async function getUserInput(curPageNum, gptPrompt, queryGPT) {
       return await prompt.get("input most anything to continue");
       break;
     default:
-      // "C" ends up here
-      return queryValue;
+      return getUserInput(curPageNum, gptResponse, queryGPT);
   }
 }

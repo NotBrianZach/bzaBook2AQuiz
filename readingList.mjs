@@ -14,25 +14,6 @@ export default {
   rdListDefaults: {
     pageNumber: 0,
     articleType: "",
-    type: {
-      value: "",
-      url: {
-        url: "",
-        textCharactersPerPage: 1800
-      },
-      html: {
-        path: "",
-        textCharactersPerPage: 1800
-      },
-      pdf: {
-        path: "",
-        isImage: ""
-      },
-      epub: {
-        path: "",
-        textCharactersPerPage: 1800
-      }
-    },
     chunkSize: 2,
     narrator: "",
     title: "",
@@ -50,45 +31,61 @@ export default {
     summaryAppendContext: [""]
   },
   readingList: {
-    Frankenstein: {
-      pageNumber: 0,
-      articleType: "book",
-      chunkSize: 2,
-      narrator: "Mr. T",
-      title: "Frankenstein",
-      synopsis:
-        "A scientist, Victor Von Frankenstein creates life by infusing corpses with lightning. His Misshapen creature seeks the affection of his father and failing that, the creation of a bride, but Frankenstein refuses leading to a climactic chase across the world as the creature rebels against his creator.",
-      isPrintPage: true,
-      isPrintChunkSummary: true,
-      isPrintRollingSummary: true,
-      quiz: false,
-      path: "./Frankenstein.pdf",
-      url: "",
-      max_tokens: 2000,
-      executable: "xpdf",
-      exeArguments: "-z 200",
-      prependContext: [""],
-      appendContext: [""]
+    // pdfs come in two types, scanned images isImage: ""
+    pdf: {
+      Frankenstein: {
+        pageNumber: 0,
+        articleType: "book",
+        chunkSize: 2,
+        narrator: "Mr. T",
+        title: "Frankenstein",
+        synopsis:
+          "A scientist, Victor Von Frankenstein creates life by infusing corpses with lightning. His Misshapen creature seeks the affection of his father and failing that, the creation of a bride, but Frankenstein refuses leading to a climactic chase across the world as the creature rebels against his creator.",
+        isPrintPage: true,
+        isPrintChunkSummary: true,
+        isPrintRollingSummary: true,
+        quiz: false,
+        path: "./Frankenstein.pdf",
+        url: "",
+        max_tokens: 2000,
+        executable: "xpdf",
+        exeArguments: "-z 200",
+        prependContext: [""],
+        appendContext: [""]
+      },
+      "World Models": {
+        pageNumber: 0,
+        articleType: "book",
+        chunkSize: 2,
+        title: "World Models: A Path to AGI",
+        narrator: "",
+        synopsis:
+          "In this research paper, Yann Lecunn outlines a differentiable architecture that would allow for online learning and creation of a world model that might be a computational analog for human intuition, intelligence, and consciouss experience.",
+        isPrintPage: false,
+        isPrintChunkSummary: false,
+        isPrintRollingSummary: false,
+        quiz: true,
+        path: "./a_path_towards_autonomous_mach.pdf",
+        url: "",
+        max_tokens: 2000,
+        executable: "xpdf",
+        exeArguments: "-z 200",
+        prependContext: [""],
+        appendContext: [""]
+      }
     },
-    "World Models": {
-      pageNumber: 0,
-      articleType: "book",
-      chunkSize: 2,
-      title: "World Models: A Path to AGI",
-      narrator: "",
-      synopsis:
-        "In this research paper, Yann Lecunn outlines a differentiable architecture that would allow for online learning and creation of a world model that might be a computational analog for human intuition, intelligence, and consciouss experience.",
-      isPrintPage: false,
-      isPrintChunkSummary: false,
-      isPrintRollingSummary: false,
-      quiz: true,
-      path: "./a_path_towards_autonomous_mach.pdf",
+    // web urls
+    url: {
       url: "",
-      max_tokens: 2000,
-      executable: "xpdf",
-      exeArguments: "-z 200",
-      prependContext: [""],
-      appendContext: [""]
+      textCharactersPerPage: 1800
+    },
+    // downloaded web pages/local html files
+    // textCharactersPerPage: 1800
+    html: {},
+    // epubs have chapters
+    epub: {
+      path: "",
+      textCharactersPerPage: 1800
     }
   }
 };
