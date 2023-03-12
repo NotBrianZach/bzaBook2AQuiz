@@ -1,11 +1,12 @@
 {
   "modeValues": ["quiz", "query"],
-  "articleTypeValues": ["book", "research paper", ""],
-  "summaryValues": ["pagechunk", "rolling", "both"],
+  "articleTypes": ["book", "research paper", ""],
+  "fileTypes": ["pdf", "url", "epub"],
   "exampleCharacterValues": ["", "socrates", "lao-tzu", "mike tyson"],
   "defaults": {
     "pageNumber": 0,
     "articleType": "book",
+    "fileType": "pdf",
     "chunkSize": 2,
     "narrator": "",
     "synopsis": "",
