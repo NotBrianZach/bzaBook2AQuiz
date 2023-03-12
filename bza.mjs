@@ -7,16 +7,21 @@ import queryUser from "./lib/queryUser.mjs"
 import runQuiz from "./lib/runQuiz.mjs"
 import { parseJSONFromFileOrReturnObjectSync, validateObj } from "./lib/utils.mjs"
 import path from "path"
+import prettier from "prettier";
+
+
 
 console.log(process.argv);
-import {createGPTQuery} from "./lib/createGPTQuery.mjs"
+import {createGPTQuery} from "./lib/createGPTQuery.mjs";
 const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY)
 
 program
   .version("0.1.0")
   .option("-f, --file <file>", "Path to file to read from")
-  .addOption(new Option("-b, --bookName <bookName>", "Book name (alternative to file)").conflicts("file"))
+  .option("-w, --weburl <weburl>", "URL to parse text from")
+  .addOption(new Option("-b, --bookName <bookName>", "look up book name in readingList&load file path from there, in case of conflict, overwrite readingList.json entry with command line params"))
   // .option("-O, --openAIAPIKey <openAIAPIKey>", "api key")// .env("openAIAPIKey")
+  .option("-n, --narrator <narrator>", "character to narrate as")
   .option("-p, --page <page>", "current page number")
   .option("-c, --chunkSize <chunkSize>", "number of pages to read at once")
   .option("-I, --isPDFImage <isPDFImage>", "if pdf is a scanned image w/no searchable text")
@@ -31,8 +36,10 @@ if (!options.file && typeof options.bookName !== "string") {
   process.exit(1);
 }
 
-const maybeReadingList = parseJSONFromFileOrReturnObjectSync('./readingList.json').readingList;
-const readingList = maybeReadingList === undefined ? {} : maybeReadingList
+const readingListFileJSON = parseJSONFromFileOrReturnObjectSync('./readingList.json');
+const readingList = readingListFileJSON.readingList;
+
+
 function removeExtraWhitespace(str) {
   // removes any instance of two or whitespace (text often has tons of padding characers), and whitespace from end and beginning of str
   return str.replace(/\s+/g, " ").trim();
@@ -86,7 +93,7 @@ if (existsBookNameInReadingList) {
     }
   };
   const { synopsis } = await prompt.get(summaryPromptSchema);
-  readingOpts = { ...readingList.readingOptsDefaults}
+  readingOpts = { ...readingList.readingOptsDefaults, synopsis, path: options.path }
 }
 
 //   - ask user for input

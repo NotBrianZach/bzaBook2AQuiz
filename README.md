@@ -2,11 +2,9 @@
 
 Interactive books. Books sliced up like pizza. Book pizza. Bza.
 
-It takes a pdf, or in the future maybe webpages or epubs, and feeds it a few pages at a time into chatgpt or similar, then outputs something, for example, a quiz on the topic of the pages it read and then waits for some form of user input to tell it to, for example, continue on or record the quiz results.
+It takes a pdf, or in the future maybe webpages or epubs, and feeds it a few pages at a time into chatgpt or similar, then outputs something, for example, a quiz on the topic of the pages it read and then waits for some form of user input to tell it to, for example, continue on or grade the quiz results, and maybe then tell a joke or make a short story about it, if feeling adventurous.
 
-Thus it could provide a way to read more actively. 
-
-By logging the conversation onto the file system it could facilitate spaced repetition of read content.
+Thus it enables more activel reading, while also keeping bookmarks for you. (along with a bunch of other infromation as well, by logging the conversation onto the file system it could facilitate spaced repetition of read content).
 
 Could also be thought of as a reading buddy, summarizer or a customizable narrator/reteller. 
 
@@ -27,11 +25,12 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 0. - IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
    - ELSE prompt user for title&synopsis, and get pageNumber&chunkSize from commandline params or defaults (0,2)
      - you can, for example, have gpt make a synopsis for you by copy pasting abstract or table of contents into e.g. openai playground and prompting it to summarize said abstract or table of contents
-   - finally initialize rollingSummary=empty string
+   - finally initialize rollingSummary="this is the start of the document"
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
-1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
-2. rollingSummary=queryGPT3(synopsis+pageChunkSummary) 
-3. Query User(title, synopsis, pageNumber pageChunkSummary, rollingSummary, toggles) 
+pageChunk = pages[pageNumber:pageNumber+chunkSize]
+1. pageChunkSummary=queryGPT(summarize pageChunk given title+synopsis+rollingSummary)
+2. Query User, act on input 
+3. rollingSummary=queryGPT3(further contextualize pageChunk with respect to rest of book, this will act as a summary of previous pages for next pageChunk)
 4. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 5.
 5. parting thoughts from gpt3, call onExit method (cleanup)
 
@@ -39,7 +38,7 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - C="Continue" to next pageChunk,
 - X="eXit" exit program, saving logs
 - ASK user for input
-  - r="repeat"/continue the conversation, 
+  - r="repeat" ask user for input, then append to prompt and query gpt, 
   - R="Restart" restart conversation w/only initial prompt
 - EVENT LOOP MODIFICATON TOGGLES
   - q="quiz" quiz loop (step 2.a. in Event Loop, prior to Query User, after summaries):
@@ -54,13 +53,13 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
   - N= "Narration" rewrite all output in the voice of a character
   - V= TODO "Voice Output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
   - v= TODO "Voice Input"  use ?talon? to allow voice input
-- MODIFY PROMPT: change all non-summary gpt queries going forward
+- MODIFY LLM PROMPT: change all non-summary llm queries going forward
   - b="before" prepend next user query input
     - "tell a joke about the following text:" 
   - d=delete stack of prepended prompts
   - A="after" append next user query input to all non summary gpt requests
     - "...tell another joke about the above text that ties into the first joke" 
-  - D=delete stack of appended prompts
+  - D="delete" stack of appended prompts
   - l="length" change response length/max token count (default 2000, max = 4096 includes prompt)
 
 ## Options & Defaults (readingList.json): 
