@@ -6,12 +6,10 @@ import pdf_extract from "pdf-extract";
 import getUserInput from "./getUserInput.mjs";
 import runQuiz from "./lib/runQuiz.mjs";
 import {
-  parseJSONFromFileOrReturnObjectSync,
   removeExtraWhitespace,
   validateObj
 } from "./lib/utils.mjs";
 import path from "path";
-import prettier from "prettier";
 import readingListTopLevel from "./readingList.js";
 const {readingList, rdListDefaults } = readingListTopLevel;
 
@@ -193,7 +191,6 @@ async function eventLoop(bzaTxt, readOpts) {
   //   rollingSummary
   // );
   const { quiz, grade } = await runQuiz(title, synopsis, pageSlice, queryGPT);
-  // fs.writeFileSync();
   getUserInput(bzaTxt, pageNum, rollingSummary, toggles);
 
   // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
