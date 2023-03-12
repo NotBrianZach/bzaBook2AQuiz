@@ -110,7 +110,7 @@ i had also been looking for technically inclined book club without luck (well i 
 
 a thought had been bubbling in my head that I wanted to read books alongside gpt3,
 
-i had previously spent quite some time trying to make multi player choose your own adventure novels a thing (and maybe still plan to?)
+i had previously spent quite some time trying to make multi player choose your own adventure novels a thing (TODO make it so you can talk to multiple different llms or prompts at once or share a repl session with your buddy or something TODO)
 
 i really thought, and think, as a massive wordcel, that computers have a vast potential to create new narrative structures
 

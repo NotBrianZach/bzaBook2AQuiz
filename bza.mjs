@@ -16,8 +16,9 @@ console.log(process.argv);
 import { createGPTQuery } from "./lib/createGPTQuery.mjs";
 const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY);
 
+// could also use https://github.com/mozilla/readability
 // There is also an alias to `convert` called `htmlToText`.
-import { convert } from 'html-to-text';
+import { htmlToText } from 'html-to-text';
 const htmlToTxtOpts = {
   wordwrap: 130
 };
@@ -26,7 +27,10 @@ import axios from 'axios';
 program
   .version("0.1.0")
   .option("-f, --file <file>", "Path to file to read from")
-  .option("-w, --webUrl <webUrl>", "URL to parse text from")
+  .addOption(new Option(
+            "-w, --webUrl <webUrl>",
+            'URL to parse text from'
+  ).conflicts(['file', 'isPDFImage']))
   .addOption(
     new Option(
       "-b, --bookName <bookName>",
@@ -42,7 +46,7 @@ program
     "if pdf is a scanned image w/no searchable text"
   )
   // .option("-C, --character <character>", "character to reply as")
-  .option("-t, --type <type>", "pdf, TODO html")
+  // .option("-t, --type <type>", "pdf, TODO html")
   .parse(process.argv);
 
 const options = program.opts();
@@ -84,10 +88,8 @@ console.log("readingListBook", readingListBook);
 const existsBookNameInReadingList = readingListBook !== undefined;
 let currentPageNumber = options.page === undefined ? 0 : options.page;
 let chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize;
-let title = "";
 let readingOpts = {};
 if (existsBookNameInReadingList) {
-  title = options.bookName;
   readingOpts = {
     ...readingListBook
   };
@@ -95,35 +97,54 @@ if (existsBookNameInReadingList) {
   var titlePromptSchema = {
     properties: {
       title: {
-        message: "Enter title",
+        message: "Enter a title (can be made up)",
         required: true
       }
     }
   };
   const { title } = await prompt.get(titlePromptSchema);
 
-  var summaryPromptSchema = {
+  var synopsisPromptSchema = {
     properties: {
-      summary: {
-        message: "Enter a summary",
+      synopsis: {
+        message: "Enter a summary/synopsis",
         required: true
       }
     }
   };
-  const { synopsis } = await prompt.get(summaryPromptSchema);
-  readingOpts = {
-    ...readingList.readingOptsDefaults,
-    synopsis,
-    path: options.path
-  };
+  const { synopsis } = await prompt.get(synopsisPromptSchema);
+
+  if (!options.file === undefined && options.file.includes("pdf")) {
+    readingOpts = {
+      ...readingList.readingOptsDefaults,
+      title,
+      synopsis,
+      path: options.path
+    };
+  }
+  if (options.webUrl !== undefined) {
+    readingOpts = {
+      ...readingList.readingOptsDefaults,
+      title,
+      synopsis,
+      path: ""
+    };
+  }
 }
 
 //   - ask user for input
 
+const nowTime = new Date();
+
 async function eventLoop(pdfTxt, readOpts) {
   const totalPages = pdfTxt.text_pages.length;
-  const pageNum = readOpts.pageNumber;
-  const chunkSize = readOpts.chunkSize;
+  const {
+    pageNum,
+    chunkSize,
+    synopsis,
+    rollingSummary,
+    title
+  } = readOpts
   console.log(
     "totalPages, pageNum, chunkSize",
     totalPages,
@@ -179,7 +200,6 @@ async function eventLoop(pdfTxt, readOpts) {
   } else {
     console.log(logs);
     // 4. record a log of all the summaries and quizzes
-    const nowTime = new Date();
     // TODO make subdirectory for ${title}
     fs.writeFileSync(
       "./logs/${nowtime}-${title}",
@@ -223,7 +243,7 @@ switch (readingOpts.fileType) {
       // function callback (error, data) { error ? console.error(error) : console.log(data.text_pages[0]) }
     }
     processor.on("complete", async function(pdfText) {
-      eventLoop(pdfTxt, currentPageNumber, "", readingOpts);
+      eventLoop(pdfTxt, readingOpts);
     });
     break;
   case "url":
@@ -233,7 +253,17 @@ switch (readingOpts.fileType) {
         // handle success
         console.log("axios response:", response);
 
-        eventLoop(response.body, currentPageNumber, "", {
+        const text = htmlToText(response.body,
+                             {
+          // selectors: [
+          //   { selector: 'a', options: { baseUrl: 'https://example.com' } },
+          //   { selector: 'a.button', format: 'skip' }
+          // ]
+        }
+                            );
+        // TODO chunk returned text pdfTxt.text_pages.slice(pageNum, pageNum + chunkSize).join("")
+
+        eventLoop(text, {
           ...readingOpts
         });
       })
