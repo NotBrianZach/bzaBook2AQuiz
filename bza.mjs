@@ -21,46 +21,16 @@ import { convert } from 'html-to-text';
 const htmlToTxtOpts = {
   wordwrap: 130
 };
-// var util = require("util"),
-//     http = require("http");
-
-// var options = {
-//   host: "www.google.com",
-//   port: 80,
-//   path: "/"
-// };
-
-// var content = "";   
-
-// var req = http.request(options, function(res) {
-//   res.setEncoding("utf8");
-//   res.on("data", function (chunk) {
-//     content += chunk;
-//   });
-
-//   res.on("end", function () {
-//     util.log(content);
-//   });
-// });
-
-// req.end();
-var request = require("request");
-
-request(
-  { uri: "http://www.sitepoint.com" },
-  function(error, response, body) {
-    console.log(body);
-  }
-);
+import axios from 'axios';
 
 program
   .version("0.1.0")
   .option("-f, --file <file>", "Path to file to read from")
-  .option("-w, --weburl <weburl>", "URL to parse text from")
+  .option("-w, --webUrl <webUrl>", "URL to parse text from")
   .addOption(
     new Option(
       "-b, --bookName <bookName>",
-      "look up book name in readingList&load file path from there, in case of conflict, overwrite readingList.json entry with command line params"
+      'look up "book" name in readingList&load file path from there, in case of conflict, overwrite readingList.json entry with command line params'
     )
   )
   // .option("-O, --openAIAPIKey <openAIAPIKey>", "api key")// .env("openAIAPIKey")
@@ -97,6 +67,7 @@ function removeExtraWhitespace(str) {
 const logs = {
   title: "",
   synopsis: "",
+  pageChunk: {},
   pageChunkSummary: {},
   rollingSummary: {},
   quizzes: {
@@ -255,11 +226,25 @@ switch (readingOpts.fileType) {
       eventLoop(pdfTxt, currentPageNumber, "", readingOpts);
     });
     break;
-case "url":
+  case "url":
+    // const text = convert(html, htmlToTxtOpts);
+    axios.get(options.webURL)
+      .then(function (response) {
+        // handle success
+        console.log("axios response:", response);
 
-  // const text = convert(html, htmlToTxtOpts);
-  // console.log(text); // Hello World
-  eventLoop(pdfTxt, currentPageNumber, "", readingOpts);
+        eventLoop(response.body, currentPageNumber, "", {
+          ...readingOpts
+        });
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .finally(function () {
+        // always executed
+      });
+    // console.log(text); // Hello World
   break;
 
   default:
