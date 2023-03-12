@@ -35,7 +35,8 @@ pageChunk = pages[pageNumber:pageNumber+chunkSize]
 5. parting thoughts from gpt3, call onExit method (cleanup)
 
 ## Query User:
-- C="Continue" to next pageChunk,
+- c="continue" to next pageChunk,
+- j="jump" to user input pageNumber,
 - X="eXit" exit program, saving logs
 - ASK user for input
   - r="repeat" ask user for input, then append to prompt and query gpt, 
@@ -46,20 +47,20 @@ pageChunk = pages[pageNumber:pageNumber+chunkSize]
     -  query gpt3 for "grade", explain "wrong" answers
     -  record a log of the quiz&answer
     -  Query User
-- TOGGLE printing to console
+- TOGGLEs print to console, and enable/disable printing in event loop
   - h="help" query options
-  - p="pageChunkSummary" gpt summary of the last chunk of pages
-  - S="Summary" gpt summary of everything up to this point
+  - s="summary of page chunk" gpt summary of the last chunk of pages
+  - S="rolling Summary" gpt summary of everything up to this point (short term memory)
   - N= "Narration" rewrite all output in the voice of a character
-  - V= TODO "Voice Output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
-  - v= TODO "Voice Input"  use ?talon? to allow voice input
+  - V= TODO "Voice output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
+  - v= TODO "voice input"  use ?talon? to allow voice input
 - MODIFY LLM PROMPT: change all non-summary llm queries going forward
   - b="before" prepend next user query input
     - "tell a joke about the following text:" 
   - d=delete stack of prepended prompts
-  - A="after" append next user query input to all non summary gpt requests
+  - A="After" append next user query input to all non summary gpt requests
     - "...tell another joke about the above text that ties into the first joke" 
-  - D="delete" stack of appended prompts
+  - D="Delete" stack of appended prompts
   - l="length" change response length/max token count (default 2000, max = 4096 includes prompt)
 
 ## Options & Defaults (readingList.json): 

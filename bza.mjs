@@ -26,7 +26,7 @@ import axios from 'axios';
 
 program
   .version("0.1.0")
-  .option("-f, --file <file>", "Path to file to read from")
+  .option("-f, --file <file>", "Path to file to read from (if epub, must be utf8)")
   .addOption(new Option(
             "-w, --webUrl <webUrl>",
             'URL to parse text from'
@@ -89,6 +89,7 @@ const existsBookNameInReadingList = readingListBook !== undefined;
 let currentPageNumber = options.page === undefined ? 0 : options.page;
 let chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize;
 let readingOpts = {};
+let fileType = ""
 if (existsBookNameInReadingList) {
   readingOpts = {
     ...readingListBook
@@ -114,20 +115,29 @@ if (existsBookNameInReadingList) {
   };
   const { synopsis } = await prompt.get(synopsisPromptSchema);
 
-  if (!options.file === undefined && options.file.includes("pdf")) {
+  if (!options.file === undefined) {
     readingOpts = {
       ...readingList.readingOptsDefaults,
       title,
       synopsis,
       path: options.path
     };
+    if (options.file.includes("pdf")) {
+      fileType = "pdf"
+    }
+    if (options.file.includes(".html")) {
+      fileType = "html"
+    }
+    if (options.file.includes(".epub")) {
+      fileType = "epub"
+    }
   }
   if (options.webUrl !== undefined) {
     readingOpts = {
       ...readingList.readingOptsDefaults,
       title,
       synopsis,
-      path: ""
+      url: options.webUrl
     };
   }
 }
@@ -143,6 +153,9 @@ async function eventLoop(pdfTxt, readOpts) {
     chunkSize,
     synopsis,
     rollingSummary,
+    isPrintPage,
+    isPrintChunkSummary,
+    isPrintRollingSummary,
     title
   } = readOpts
   console.log(
@@ -159,23 +172,19 @@ async function eventLoop(pdfTxt, readOpts) {
     `Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`
   );
 
-  // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
-  const newRollingSummary = queryGPT(
-    `Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT with respect to the rest of the book, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`
-  );
-  if (toggles.isPrintPage) {
+  if (isPrintPage) {
     console.log(
       `Summary of pages ${pageNum} to ${pageNum + chunkSize}:`,
       rollingSummary
     );
   }
-  if (toggles.isPrintChunkSummary) {
+  if (isPrintChunkSummary) {
     console.log(
       `Summary of pages ${pageNum} to ${pageNum + chunkSize}:`,
       rollingSummary
     );
   }
-  if (toggles.isPrintRollingSummary) {
+  if (isPrintRollingSummary) {
     console.log(
       `Summary of pages ${pageNum} to ${pageNum + chunkSize}:`,
       rollingSummary
@@ -189,6 +198,11 @@ async function eventLoop(pdfTxt, readOpts) {
   const { quiz, grade } = await runQuiz(title, synopsis, pageSlice, queryGPT);
   fs.writeFileSync();
   queryUser(pdfTxt, pageNum, rollingSummary, toggles);
+
+  // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
+  const newRollingSummary = queryGPT(
+    `Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT with respect to the rest of the book, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`
+  );
 
   // console.log(`New Meta Summary:`, synopsis);
   if (pageNum + chunkSize < totalPages) {
