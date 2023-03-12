@@ -6,9 +6,12 @@ It feeds a pdf, webpage, or epub a few (chunkSize) pages at a time into chatgpt 
 
 then outputs something, for example, a quiz on the topic of the pages it read 
 
-then waits for user input to tell it to, for example, continue on , and maybe then tell a joke or make a short story about it, if feeling adventurous.
+then waits for user input to tell it to, for example, continue on, and maybe then tell a joke or make a short story about it, or translate into spanish. lots of possibilities.  
 
-This is a more active form of reading, that comes with bookmarks and a bunch of other information as well, see readingList.js.
+This makes for a more active form of reading, 
+
+and generates bookmarks and a bunch of other information as well,
+see readingList.js.
 
 Could also be thought of as a reading buddy, summarizer or a customizable narrator/reteller. 
 
