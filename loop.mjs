@@ -13,7 +13,7 @@ import {
 import path from "path";
 import prettier from "prettier";
 import readingListTopLevel from "./readingList.js";
-const readingList = readingListTopLevel.readingList;
+const {readingList, rdListDefaults } = readingListTopLevel;
 
 console.log(process.argv);
 import { createGPTQuery } from "./lib/createGPTQuery.mjs";
@@ -143,8 +143,8 @@ if (existsBookNameInReadingList) {
 
 const nowTime = new Date();
 
-async function eventLoop(pdfTxt, readOpts) {
-  const totalPages = pdfTxt.text_pages.length;
+async function eventLoop(bzaTxt, readOpts) {
+  const totalPages = bzaTxt.text_pages.length;
   const {
     pageNum,
     chunkSize,
@@ -163,10 +163,10 @@ async function eventLoop(pdfTxt, readOpts) {
   );
   // 1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
   const pageSlice = removeExtraWhitespace(
-    pdfTxt.text_pages.slice(pageNum, pageNum + chunkSize).join("")
+    bzaTxt.text_pages.slice(pageNum, pageNum + chunkSize).join("")
   );
   const chunkSummary = queryGPT(
-    `Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`
+    genChunkSummaryPrompt(title, synopsis, rollingSummary, pageSlice)
   );
 
   if (isPrintPage) {
@@ -194,17 +194,15 @@ async function eventLoop(pdfTxt, readOpts) {
   // );
   const { quiz, grade } = await runQuiz(title, synopsis, pageSlice, queryGPT);
   // fs.writeFileSync();
-  getUserInput(pdfTxt, pageNum, rollingSummary, toggles);
+  getUserInput(bzaTxt, pageNum, rollingSummary, toggles);
 
   // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
-  const newRollingSummary = queryGPT(
-    `Given TITLE, OVERALL SUMMARY, and RECENT SUMMARY of content up to this point, summarize the following EXCERPT with respect to the rest of the book, TITLE: ${title}, OVERALL SUMMARY: ${synopsis}, RECENT SUMMARY: ${rollingSummary}, EXCERPT: ${pageSlice}`
-  );
+  const newRollingSummary = queryGPT(genRollingSummaryPrompt(title, synopsis, rollingSummary, excerpt));
 
   // console.log(`New Meta Summary:`, synopsis);
   if (pageNum + chunkSize < totalPages) {
     // logSummary.push(rollingSummary);
-    return eventLoop(pdfTxt, {
+    return eventLoop(bzaTxt, {
       ...readOpts,
       pageNum: pageNum + chunkSize
     });
@@ -237,6 +235,7 @@ async function eventLoop(pdfTxt, readOpts) {
         readOpts
       })
     );
+    return "successful loop exit"
   }
 }
 
@@ -282,7 +281,6 @@ switch (readingOpts.fileType) {
       .then(function(response) {
         // handle success
         console.log("axios response:", response);
-
         const text = htmlToText(response.body, {
           // selectors: [
           //   { selector: 'a', options: { baseUrl: 'https://example.com' } },
@@ -290,7 +288,6 @@ switch (readingOpts.fileType) {
           // ]
         });
         // TODO chunk returned text pdfTxt.text_pages.slice(pageNum, pageNum + chunkSize).join("")
-
         eventLoop(text, {
           ...readingOpts
         });

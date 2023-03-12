@@ -114,13 +114,13 @@ a thought had been bubbling in my head that I wanted to read books alongside gpt
 
 i had previously spent quite some time trying to make multi player choose your own adventure novels a thing (TODO make it so you can talk to multiple different llms or prompts at once or share a repl session with your buddy or something TODO)
 
-i really thought, and think, as a massive wordcel, that computers have a vast potential to create new narrative structures
+in my opinion, computers have a vast potential to create new narrative structures
 
 then i saw this reddit post
 
 https://www.reddit.com/r/singularity/comments/11ho23y/first_post_in_reddit_mistakely_used_a_text_post/
 
-and a within a couple minutes, after some good ole reddit arguing, i started writing this
+and a within a couple minutes (well, techincally, i had started working a bit the day before on a book2quiz concept), after some good ole reddit arguing, i started writing this
 
 ## Pushdown Large Language Models
 
@@ -140,7 +140,7 @@ i believe they would have been more akin to a push down automata, or context fre
 
 since the story would maintain a list of invalidated edges (which could also be thought of as a unique class of "intermediate" node that dont branch),
 
-and transitions between nodes could change the choices available to other players
+and transitions between nodes (player choices) could change the choices available to other players
 
 i think there is a similar analogy going on here.
 
