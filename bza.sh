@@ -5,7 +5,7 @@ const prompt  = require("prompt");
 const { exec, spawn } =  require('child_process');
 const path = require("path");
 console.log(process.argv);
-readingList = JSON.parse(fs.readFileSync(path.resolve("./readingList.json")))
+import readingListTopLevel from "./readingList.js";
 
 function isValidObject(str) {
   try {

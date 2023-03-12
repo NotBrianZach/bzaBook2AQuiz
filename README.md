@@ -1,10 +1,14 @@
-# BZA: A GPT-Powered Conversational Read Eval Print Loop for Books, Articles & Webpages (WIP)
+# Book piZzA, bza: A GPT-Powered Conversational Read Eval Print Loop and Bookmarks Manager for Books, Articles & Webpages (WIP)
 
 Interactive books. Books sliced up like pizza. Book pizza. Bza.
 
-It takes a pdf, or in the future maybe webpages or epubs, and feeds it a few pages at a time into chatgpt or similar, then outputs something, for example, a quiz on the topic of the pages it read and then waits for some form of user input to tell it to, for example, continue on or grade the quiz results, and maybe then tell a joke or make a short story about it, if feeling adventurous.
+It feeds a pdf, webpage, or epub a few pages at a time into chatgpt or another LLM,
 
-Thus it enables more activel reading, while also keeping bookmarks for you. (along with a bunch of other infromation as well, by logging the conversation onto the file system it could facilitate spaced repetition of read content).
+then outputs something, for example, a quiz on the topic of the pages it read 
+
+then waits for user input to tell it to, for example, continue on , and maybe then tell a joke or make a short story about it, if feeling adventurous.
+
+This is a more active form of reading, that comes with bookmarks and a bunch of other information as well, see readingList.js.
 
 Could also be thought of as a reading buddy, summarizer or a customizable narrator/reteller. 
 
@@ -19,22 +23,22 @@ Could also be thought of as a reading buddy, summarizer or a customizable narrat
 - get $OPENAI_API_KEY key [here](https://platform.openai.com/account/api-keys) if u dont have 
 - `OPENAI_API_KEY=$OPENAI_API_KEY ./bza.mjs -f path_2_ur_pdf_here.pdf`
 - open an issue detailing why doesnt work
-- ELITE HACKER: possibly move readingList.json && logs directory into another directory under source control or cloud backup and create a symlink(s) here (under bzabook2aquiz directory) pointing to it/them
+- ELITE HACKER: possibly move readingList.js && logs directory into another directory under source control or cloud backup and create a symlink(s) here (under bzabook2aquiz directory) pointing to it/them
 
 ## Event Loop Setup: 
-0. - IF readingList.json has an entry for bookName, load title & synopsis & rollingSummary from there
+0. - IF readingList.js has an entry for bookName, load title & synopsis & rollingSummary from there
    - ELSE prompt user for title&synopsis, and get pageNumber&chunkSize from commandline params or defaults (0,2)
      - you can, for example, have gpt make a synopsis for you by copy pasting abstract or table of contents into e.g. openai playground and prompting it to summarize said abstract or table of contents
    - finally initialize rollingSummary="this is the start of the document"
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
 pageChunk = pages[pageNumber:pageNumber+chunkSize]
 1. pageChunkSummary=queryGPT(summarize pageChunk given title+synopsis+rollingSummary)
-2. Query User, act on input 
+2. get User Input, act on input 
 3. rollingSummary=queryGPT3(further contextualize pageChunk with respect to rest of book, this will act as a summary of previous pages for next pageChunk)
 4. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 5.
 5. parting thoughts from gpt3, call onExit method (cleanup)
 
-## Query User:
+## User Input:
 - c="continue" to next pageChunk,
 - j="jump" to user input pageNumber,
 - X="eXit" exit program, saving logs
@@ -42,11 +46,11 @@ pageChunk = pages[pageNumber:pageNumber+chunkSize]
   - r="repeat" ask user for input, then append to prompt and query gpt, 
   - R="Restart" restart conversation w/only initial prompt
 - EVENT LOOP MODIFICATON TOGGLES
-  - q="quiz" quiz loop (step 2.a. in Event Loop, prior to Query User, after summaries):
+  - q="quiz" quiz loop (step 1.a. in Event Loop, prior to User Input, after summaries):
     -  query gpt3 to generate quiz, print quiz, query user for answers
     -  query gpt3 for "grade", explain "wrong" answers
-    -  record a log of the quiz&answer
-    -  Query User
+    -  save a log of the quiz&answer
+    -  get User Input
 - TOGGLEs print to console, and enable/disable printing in event loop
   - h="help" query options
   - s="summary of page chunk" gpt summary of the last chunk of pages
@@ -63,11 +67,10 @@ pageChunk = pages[pageNumber:pageNumber+chunkSize]
   - D="Delete" stack of appended prompts
   - l="length" change response length/max token count (default 2000, max = 4096 includes prompt)
 
-## Options & Defaults (readingList.json): 
-- Article format: [pdf, TODO html, TODO epub]
-- Article Type: [book, research paper, news]
+## Options & Defaults: 
+Please see the readingList.js for available options
 
-## Reading List Utility (bzaUtil.sh)
+## Reading List Utility (bza.sh)
 - store path to pdf and relevant executable to read it
 - backup & rotate logs
 - restore from logs
@@ -79,16 +82,14 @@ Also it would be nice to use other binary dependencies that can read pdfs or oth
 
 ## Naming
 The naive/correct pronounciation sounds like pizza, which is typically sliced into pieces just like we are chunking up books. Book pizza. 
+![bzatime](bzatime.jpg)
 
 bza is also my initials. #branding
 
 and bza is a short three letter word which is not too overloaded and can be invoked easily on the command line.
 
-Finally, book starts with B, quiz ends with Z and A is A. So it's like an anagram of some of the letters. 
-
 Makes total sense. 
 
-![bzatime](bzatime.jpg)
 ## Inspiration
 
 i have kept, for a couple years, a reading list with commands like

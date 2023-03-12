@@ -1,8 +1,8 @@
 import prompt from "prompt";
-import runQuiz from "./runQuiz.mjs";
+import runQuiz from "./lib/runQuiz.mjs";
 import fs from "fs";
 //   - ask user for input
-export async function queryUser(curPageNum, gptPrompt, queryGPT) {
+export async function getUserInput(curPageNum, gptPrompt, queryGPT) {
   const defaultQuerySchema = {
     properties: {
       nextAction: {
@@ -56,7 +56,7 @@ export async function queryUser(curPageNum, gptPrompt, queryGPT) {
         pageSlice,
         queryGPT
       );
-      // fs.writeFileSync(`./readingList.json`, JSON.stringify(readingListEntry));
+      // fs.writeFileSync(`./readingList.js`, JSON.stringify(readingListEntry));
       return await prompt.get("input most anything to continue");
       break;
     default:

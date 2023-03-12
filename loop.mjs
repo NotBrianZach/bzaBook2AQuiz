@@ -3,14 +3,17 @@ import { program, Option } from "commander";
 import fs from "fs";
 import prompt from "prompt";
 import pdf_extract from "pdf-extract";
-import queryUser from "./lib/queryUser.mjs";
+import getUserInput from "./getUserInput.mjs";
 import runQuiz from "./lib/runQuiz.mjs";
 import {
   parseJSONFromFileOrReturnObjectSync,
+  removeExtraWhitespace,
   validateObj
 } from "./lib/utils.mjs";
 import path from "path";
 import prettier from "prettier";
+import readingListTopLevel from "./readingList.js";
+const readingList = readingListTopLevel.readingList;
 
 console.log(process.argv);
 import { createGPTQuery } from "./lib/createGPTQuery.mjs";
@@ -18,23 +21,28 @@ const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY);
 
 // could also use https://github.com/mozilla/readability
 // There is also an alias to `convert` called `htmlToText`.
-import { htmlToText } from 'html-to-text';
+import { htmlToText } from "html-to-text";
 const htmlToTxtOpts = {
   wordwrap: 130
 };
-import axios from 'axios';
+import axios from "axios";
 
 program
   .version("0.1.0")
-  .option("-f, --file <file>", "Path to file to read from (if epub, must be utf8)")
-  .addOption(new Option(
-            "-w, --webUrl <webUrl>",
-            'URL to parse text from'
-  ).conflicts(['file', 'isPDFImage']))
+  .option(
+    "-f, --file <file>",
+    "Path to file to read from (if epub, must be utf8)"
+  )
+  .addOption(
+    new Option("-w, --webUrl <webUrl>", "URL to parse text from").conflicts([
+      "file",
+      "isPDFImage"
+    ])
+  )
   .addOption(
     new Option(
       "-b, --bookName <bookName>",
-      'look up "book" name in readingList&load file path from there, in case of conflict, overwrite readingList.json entry with command line params'
+      'look up "book" name in readingList&load file path from there, in case of conflict, overwrite readingList.js entry with command line params'
     )
   )
   // .option("-O, --openAIAPIKey <openAIAPIKey>", "api key")// .env("openAIAPIKey")
@@ -58,16 +66,6 @@ if (!options.file && typeof options.bookName !== "string") {
   process.exit(1);
 }
 
-const readingListFileJSON = parseJSONFromFileOrReturnObjectSync(
-  "./readingList.json"
-);
-const readingList = readingListFileJSON.readingList;
-
-function removeExtraWhitespace(str) {
-  // removes any instance of two or whitespace (text often has tons of padding characers), and whitespace from end and beginning of str
-  return str.replace(/\s+/g, " ").trim();
-}
-
 const logs = {
   title: "",
   synopsis: "",
@@ -89,7 +87,7 @@ const existsBookNameInReadingList = readingListBook !== undefined;
 let currentPageNumber = options.page === undefined ? 0 : options.page;
 let chunkSize = options.chunkSize === undefined ? 2 : options.chunkSize;
 let readingOpts = {};
-let fileType = ""
+let fileType = "";
 if (existsBookNameInReadingList) {
   readingOpts = {
     ...readingListBook
@@ -117,24 +115,24 @@ if (existsBookNameInReadingList) {
 
   if (!options.file === undefined) {
     readingOpts = {
-      ...readingList.readingOptsDefaults,
+      ...readingListTopLevel.defaults,
       title,
       synopsis,
       path: options.path
     };
     if (options.file.includes("pdf")) {
-      fileType = "pdf"
+      fileType = "pdf";
     }
     if (options.file.includes(".html")) {
-      fileType = "html"
+      fileType = "html";
     }
     if (options.file.includes(".epub")) {
-      fileType = "epub"
+      fileType = "epub";
     }
   }
   if (options.webUrl !== undefined) {
     readingOpts = {
-      ...readingList.readingOptsDefaults,
+      ...readingListTopLevel.defaults,
       title,
       synopsis,
       url: options.webUrl
@@ -142,7 +140,6 @@ if (existsBookNameInReadingList) {
   }
 }
 
-//   - ask user for input
 
 const nowTime = new Date();
 
@@ -157,7 +154,7 @@ async function eventLoop(pdfTxt, readOpts) {
     isPrintChunkSummary,
     isPrintRollingSummary,
     title
-  } = readOpts
+  } = readOpts;
   console.log(
     "totalPages, pageNum, chunkSize",
     totalPages,
@@ -196,8 +193,8 @@ async function eventLoop(pdfTxt, readOpts) {
   //   rollingSummary
   // );
   const { quiz, grade } = await runQuiz(title, synopsis, pageSlice, queryGPT);
-  fs.writeFileSync();
-  queryUser(pdfTxt, pageNum, rollingSummary, toggles);
+  // fs.writeFileSync();
+  getUserInput(pdfTxt, pageNum, rollingSummary, toggles);
 
   // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
   const newRollingSummary = queryGPT(
@@ -215,6 +212,24 @@ async function eventLoop(pdfTxt, readOpts) {
     console.log(logs);
     // 4. record a log of all the summaries and quizzes
     // TODO make subdirectory for ${title}
+    // const newBookNameDirectory = "./";
+    // fs.access(path, (error) => {
+    //   // To check if the given directory
+    //   // already exists or not
+    //   if (error) {
+    //     // If current directory does not exist
+    //     // then create it
+    //     fs.mkdir(path, (error) => {
+    //       if (error) {
+    //         console.log(error);
+    //       } else {
+    //         console.log("New Directory created successfully !!");
+    //       }
+    //     });
+    //   } else {
+    //     console.log("Given Directory already exists !!");
+    //   }
+    // TODO clean up /run/user if using pdf-extract and there are files present
     fs.writeFileSync(
       "./logs/${nowtime}-${title}",
       JSON.stringify({
@@ -262,34 +277,35 @@ switch (readingOpts.fileType) {
     break;
   case "url":
     // const text = convert(html, htmlToTxtOpts);
-    axios.get(options.webURL)
-      .then(function (response) {
+    axios
+      .get(options.webURL)
+      .then(function(response) {
         // handle success
         console.log("axios response:", response);
 
-        const text = htmlToText(response.body,
-                             {
+        const text = htmlToText(response.body, {
           // selectors: [
           //   { selector: 'a', options: { baseUrl: 'https://example.com' } },
           //   { selector: 'a.button', format: 'skip' }
           // ]
-        }
-                            );
+        });
         // TODO chunk returned text pdfTxt.text_pages.slice(pageNum, pageNum + chunkSize).join("")
 
         eventLoop(text, {
           ...readingOpts
         });
       })
-      .catch(function (error) {
+      .catch(function(error) {
         // handle error
         console.log(error);
       })
-      .finally(function () {
+      .finally(function() {
         // always executed
       });
     // console.log(text); // Hello World
-  break;
+    break;
+  case "epub":
+    break;
 
   default:
     console.error("no filetype or url specified or inferrable");
