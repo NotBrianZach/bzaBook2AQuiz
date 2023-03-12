@@ -20,10 +20,10 @@ Could also be thought of as a reading buddy, summarizer or customizable narrator
 - install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - `git clone https://github.com/NotBrianZach/bzabook2aquiz.git`
 - `cd bzabook2aquiz`
-- `nix-shell`
+- `nix-shell` (might take a few minutes to download and install dependencies)
 - `npm install`
 - get $OPENAI_API_KEY key [here](https://platform.openai.com/account/api-keys) if u dont have 
-- `OPENAI_API_KEY=$OPENAI_API_KEY ./bza.sh -f path_2_ur_pdf_here.pdf`
+- `OPENAI_API_KEY=$OPENAI_API_KEY bza -f path_2_ur_pdf_here.pdf`
 - open an issue detailing why doesnt work
 - ELITE HACKER: possibly move readingList.js && logs directory into another directory under source control or cloud backup and create a symlink(s) here (under bzabook2aquiz directory) pointing to it/them
 
