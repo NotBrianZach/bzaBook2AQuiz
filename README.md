@@ -10,9 +10,7 @@ then waits for user input to tell it to, for example, continue on, and maybe the
 
 This makes for a more active form of reading, 
 
-and generates bookmarks and a bunch of other information as well,
-
-see readingList.mjs.
+and generates bookmarks and a bunch of other information as well, see readingList.mjs.
 
 Could also be thought of as a reading buddy, summarizer or customizable narrator/reteller. 
 
