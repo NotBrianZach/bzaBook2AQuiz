@@ -1,6 +1,6 @@
-# Book piZzA, bza: A GPT-Powered Conversational Read Eval Print Loop and Bookmarks Manager for Books, Articles & Webpages (WIP)
+# Book piZzA: A GPT-Powered Conversational Read Eval Print Loop and Bookmarks Manager for Books, Articles & Webpages (WIP)
 
-Interactive books. Books sliced up like pizza. Book pizza. Bza.
+Interactive books. Books sliced up like pizza. Book pizza. bza.
 
 It feeds a pdf, webpage, or epub a few (chunkSize) pages at a time into chatgpt or another LLM,
 
