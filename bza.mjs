@@ -11,6 +11,9 @@ import eventLoop from "./eventLoop.mjs";
 // could also use https://github.com/mozilla/readability
 // There is also an alias to `convert` called `htmlToText`.
 import { htmlToText } from "html-to-text";
+import { createGPTQuery } from "./lib/createGPTQuery.mjs";
+const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY);
+
 import Database from "better-sqlite3";
 
 import axios from "axios";
@@ -19,8 +22,8 @@ const htmlToTxtOpts = {
 };
 
 program
-  .command("b")
-  .description("boookmarks")
+  .command("printBookmarks")
+  // .description("print bookmarks")
   .action(() => {
     // console.log(Object.keys(readingList).map((val, tit) => tit));
     // TODO replace with sequel query
@@ -37,71 +40,6 @@ program
   .description('initialize "bookmark" database idempotently')
   .action(() => {
     // console.log(Object.keys(readingList).map((val, tit) => tit));
-    const db = new Database("./bookmarks.sq3", {
-      // fileMustExist: true,
-      timeout: 2000 // 2 seconds
-      // verbose: sqlstatement => console.log(`sqlite3 trace ${sqlstatement}`)
-    });
-    db.pragma("journal_mode = WAL");
-
-    const dbDelete = db.prepare("drop tables");
-    dbDelete.run();
-  });
-
-program
-  .command("initDB")
-  .description('initialize "bookmark" database idempotently')
-  .action(() => {
-    // console.log(Object.keys(readingList).map((val, tit) => tit));
-    const db = new Database("./bookmarks.sq3", {
-      // fileMustExist: true,
-      timeout: 2000 // 2 seconds
-      // verbose: sqlstatement => console.log(`sqlite3 trace ${sqlstatement}`)
-    });
-    db.pragma("journal_mode = WAL");
-
-    const dbBookmarks = db.prepare(
-      "create table if not exists bookmarks (bTitle TEXT primary key, title TEXT not null default '', synopsis TEXT not null default '', pageNumber INTEGER not null default 0, isQuiz boolean default false, isPrintPage boolean default false, isPrintChunkSummary boolean default false, chunkSize INTEGER not null default 2, maxTokens INTEGER not null default 2000, narrator TEXT, last_read_tstamp TEXT)"
-    );
-    // articleType: "",
-    dbBookmarks.run();
-
-    const dbContexts = db.prepare(
-      `create table if not exists contexts (bTitle TEXT primary key,
-        order int not null,
-        prepend text not null default '',
-        append text not null default '',
-        prependSummary text not null default '',
-        appendSummary text not null default '' primary key(bTitle, order))`
-    );
-    dbContexts.run();
-    const dbPDFs = db.prepare(
-      "create table if not exists pdfs (bTitle TEXT primary key, readerExe text not null default 'mupdf', readerArgs not null default '-Y 2', isImage boolean)"
-    );
-    dbPdfs.run();
-    const dbHTML = db.prepare(
-      "create table if not exists pdfs (bTitle TEXT primary key, readerExe text not null default 'chromium', readerArgs not null default '-Y 2', isImage boolean)"
-    );
-    dbHTML.run();
-    const dbLogging = db.prepare(
-      "create table if not exists logs (btitle TEXT not null primaryKey, pageNumber INTEGER, msg TEXT not null default, timestamp TEXT)"
-    );
-    dbLogging.run();
-
-    // title: "",
-    // synopsis: "",
-    // pageChunk: {},
-    // pageChunkSummary: {},
-    // rollingSummary: {},
-    // quizzes: {
-    //   "0-2": {
-    //     questions: "",
-    //     answers: "",
-    //     readingList: {}
-    //   }
-    // }
-
-    console.log("initialized database");
   });
 
 // .option("-C, --character <character>", "character to reply as")
@@ -271,7 +209,7 @@ program
           // function callback (error, data) { error ? console.error(error) : console.log(data.text_pages[0]) }
         }
         processor.on("complete", async function(pdfText) {
-          eventLoop(pdfTxt, readingOpts);
+          eventLoop(pdfTxt, readingOpts, queryGPT);
         });
         break;
       case "url":
@@ -290,7 +228,7 @@ program
             // TODO chunk returned text pdfTxt.text_pages.slice(pageNum, pageNum + chunkSize).join("")
             eventLoop(text, {
               ...readingOpts
-            });
+            }, queryGPT);
           })
           .catch(function(error) {
             // handle error

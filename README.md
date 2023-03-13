@@ -27,7 +27,6 @@ Could also be thought of as a reading buddy, summarizer or customizable narrator
 - or (TODO)
 - `OPENAI_API_KEY=$OPENAI_API_KEY bza -w https://www.reddit.com/r/WritingPrompts/comments/5uilpw/wp_the_year_is_1910_adolf_hitler_a_struggling/`
 - open an issue detailing why doesnt work
-- ELITE HACKER: possibly move readingList.js && logs directory into another directory under source control or cloud backup and create a symlink(s) here (under bzabook2aquiz directory) pointing to it/them
 
 ## Event Loop Setup: 
 0. - IF readingList.js has an entry for bookName, load title & synopsis & rollingSummary from there
@@ -35,47 +34,69 @@ Could also be thought of as a reading buddy, summarizer or customizable narrator
      - you can, for example, have gpt make a synopsis for you by copy pasting abstract or table of contents into e.g. openai playground and prompting it to summarize said abstract or table of contents
    - finally initialize rollingSummary="this is the start of the document"
 ## Event Loop: Giving Gpt3 Short & Long Term Memory 
-const pageChunk = pages[pageNumber:pageNumber+chunkSize]
-1. pageChunkSummary=queryGPT(summarize pageChunk given title+synopsis+rollingSummary)
-2. get User Input, act on input 
-3. rollingSummary=queryGPT3(further contextualize pageChunk with respect to rest of book, this will act as a summary of previous pages for next pageChunkSummary)
-4. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 5.
-5. parting thoughts from gpt3, call onExit method (cleanup)
+1. const pageChunk = pages.slice(pageNumber,pageNumber+chunkSize)
+2. pageChunkSummary=queryGPT(summarize pageSlice given title+synopsis+rollingSummary)
+3. get User Input, act on input 
+4. rollingSummary=queryGPT3(further contextualize pageSlice with respect to rest of book, this will act as a summary of previous pages for next pageChunkSummary)
+5. WHILE (pageNumber < bookLength), set pageNumber=pageNumber+chunkSize, jump back to 1. else continue to 6.
+6. parting thoughts from gpt3, call onExit method (cleanup)
 
-## User Input:
+## Quiz SubLoop: 
+if toggled on, start after step 1 in Event Loop
+1. query gpt3 to generate quiz, print quiz, 
+2. get user input for answers
+3. query gpt3 for "grade", explain "wrong" answers
+4. get user input 
+      - save=save a log of the quiz&answers,
+      - delete=don't log quiz
+      - talk=talk to gpt about quiz
+      - again=run quiz loop again, saving log
+      - againFresh=run quiz loop again, don't log
+5. get User Input (default options)
+
+## User Input (default options):
 - c="continue" to next pageChunk,
 - j="jump" to input pageNumber,
 - EX="EXit" exit program, saving logs
-- ASK user for input
-  - r="repeat" ask user for input, then append to prompt and query gpt, 
-  - RE="REstart" restart conversation w/only initial prompt
-- EVENT LOOP TOGGLES
-  - q="quiz" quiz loop (step 1.a. in Event Loop, prior to User Input, after summaries):
-    -  query gpt3 to generate quiz, print quiz, query user for answers
-    -  query gpt3 for "grade", explain "wrong" answers
-    -  save a log of the quiz&answer
-    -  get User Input
-- PRINT TOGGLES: print to console, and enable/disable printing in event loop
-  - h="help" query options
-  - s="summary of page chunk" gpt summary of the last chunk of pages
-  - S="rolling Summary" gpt summary of everything up to this point (short term memory)
-  - N= "Narration" rewrite all output in the voice of a character
-  - V= TODO "Voice output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
-  - v= TODO "voice input"  use ?talon? to allow voice input
-- LLM PROMPT MODIFICATION: change all non-summary llm queries going forward
-  - b="before" prepend next user query input
-    - "tell a joke about the following text:" 
-  - d=delete stack of prepended prompts
-  - A="After" append next user query input to all non summary gpt requests
-    - "...tell another joke about the above text that ties into the first joke" 
-  - D="Delete" stack of appended prompts
-  - l="length" change response length/max token count (default 2000, max = 4096 includes prompt)
+ASK user for input
+- r="repeat" ask user for input, then append to prompt and query gpt, 
+- RE="REstart" restart conversation w/only initial prompt and save to logs
+- REDT="REstart DesTructive" hard restart conversation w/only initial prompt
+EVENT LOOP TOGGLES
+- quiz= run quiz loop once
+- toggleQuiz= quiz loop (step 1.a. in Event Loop, prior to User Input, after summaries):
+PRINT TOGGLES: print to console, and enable/disable printing in event loop
+- h or help = show options
+- chunk="summary of page chunk" print gpt summary of the last chunk of pages
+- roll="rolling summary" print gpt summary of everything up to this point (short term memory)
+- narrate= rewrite all output in the voice of a character
+- voiceOut= TODO "Voice output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
+- voiceIn= TODO "voice input"  use ?talon? to allow voice input
+LLM PROMPT MODIFICATION: change all non-summary llm queries going forward
+- before= get user input, prepend to conversation prompt
+  - "tell a joke about the following text:" 
+- delBefore=delete stack of prepended prompts
+- after= append next user query input to all non summary gpt requests
+  - "...tell another joke about the above text that ties into the first joke" 
+- delAfter= delete stack of appended prompts
+- maxToken=change response length/max token count (default 2000, max = 4096 includes prompt)
+LLM SUMMARY PROMPT MODIFICATION: change all summary llm queries going forward
+- beforeSummary= get user input, prepend to summarization prompt
+  - "" 
+- delBeforeSummary=delete stack of prepended prompts
+- afterSummary= append next user query input to all summary gpt requests
+  - "" 
+- delAfterSummary= delete stack of appended prompts
+- maxTokenSummary=change response length/max summary token count (default 2000, max = 4096 includes summary prompts)
 
 ## Command Line Meta Commands (bza)
-- initDB, idempotent, triggered by nix-shell
-- deleteDB you probably dont want to do this
+- printLog
+  - 
 - resumeFromLog
-## Options & Defaults: 
+
+## Options (): 
+
+## Options (database schema): 
 
 
 ## Design Decisions

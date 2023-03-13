@@ -9,11 +9,9 @@ import {
   validateObj
 } from "./lib/utils.mjs";
 import path from "path";
-import { createGPTQuery } from "./lib/createGPTQuery.mjs";
-const queryGPT = createGPTQuery(process.env.OPENAI_API_KEY);
 
 const nowTime = new Date();
-export default async function eventLoop(bzaTxt, readOpts) {
+export default async function eventLoop(bzaTxt, readOpts, queryGPT) {
   const totalPages = bzaTxt.text_pages.length;
   const {
     pageNum,
@@ -31,17 +29,16 @@ export default async function eventLoop(bzaTxt, readOpts) {
     readOpts.pageNumber,
     readOpts.chunkSize
   );
-  // 1. pageChunkSummary=queryGPT(beforeContext+synopsis+title+rollingSummary+pages[pageNumber:pageNumber+chunkSize]+afterContext)
-  const pageSlice = removeExtraWhitespace(
+  const pageChunk = removeExtraWhitespace(
     bzaTxt.text_pages.slice(pageNum, pageNum + chunkSize).join("")
   );
   const chunkSummary = queryGPT(
-    genChunkSummaryPrompt(title, synopsis, rollingSummary, pageSlice)
+    genChunkSummaryPrompt(title, synopsis, rollingSummary, pageChunk)
   );
 
   if (isPrintPage) {
     console.log(
-      `Summary of pages ${pageNum} to ${pageNum + chunkSize}:`,
+      `Page Chunk`,
       rollingSummary
     );
   }
@@ -62,7 +59,7 @@ export default async function eventLoop(bzaTxt, readOpts) {
   //     chunkSize}:`,
   //   rollingSummary
   // );
-  const { quiz, grade } = await runQuiz(title, synopsis, pageSlice, queryGPT);
+  const { quiz, grade } = await runQuiz(title, synopsis, pageChunk, queryGPT);
   getUserInput(bzaTxt, pageNum, rollingSummary, toggles);
 
   // 2. rollingSummary=queryGPT3(synopsis+pageChunkSummary)
