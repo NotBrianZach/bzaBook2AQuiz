@@ -34,17 +34,19 @@ const dbHTML = db.prepare(
   `create table if not exists pdfs (bTitle TEXT primary key,
  filepath text not null,
  isPrintPage boolean default true,
+ pageLengthInChars INTEGER not null default 1800,
  readerExe text,
- readerArgs text,
- isImage boolean)`
+ readerArgs text
+ )`
 );
 dbHTML.run();
 const dbURL = db.prepare(
-  `create table if not exists pdfs (bTitle TEXT primary key,
+  `create table if not exists urls (bTitle TEXT primary key,
  isPrintPage boolean default true,
+ pageLengthInChars INTEGER not null default 1800,
  readerExe text,
- readerArgs text,
- isImage boolean)`
+ readerArgs text
+ )`
 );
 dbURL.run();
 const dbLogging = db.prepare(
@@ -83,6 +85,7 @@ const dbExamplePDFBook = db.prepare(
   //     prependContext: [""],
   //     appendContext: [""]
 );
+
 dbExamplePDFBook.run();
 // pdf: {
 //   },

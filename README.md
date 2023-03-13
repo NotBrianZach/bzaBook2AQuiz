@@ -15,9 +15,10 @@ and generates bookmarks and a bunch of other information as well, see readingLis
 Could also be thought of as a reading buddy, summarizer or customizable narrator/reteller. 
 
 ## To Run (TODO)
-- if windows then install windows subsystem for linux 
-- install [the nix package manager](https://nixos.org/download.html) (select appropriate operating system from sidebar)
+- if windows, install [windows subsystem for linux](https://learn.microsoft.com/en-us/windows/wsl/install)
+- install [the nix package manager](https://nixos.org/download.html)
 - install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- open a terminal or shell (if you don't know how, you could ask chatgpt...)
 - `git clone https://github.com/NotBrianZach/bzabook2aquiz.git`
 - `cd bzabook2aquiz`
 - `nix-shell` (might take a few minutes to download and install dependencies)
@@ -64,7 +65,7 @@ if toggled on, start after step 1 in Event Loop
 - REDT="REstart DesTructive" hard restart conversation w/only initial prompt
 ##### SUBLOOP COMMANDS
 - quiz= run quiz loop once
-- toggleQuiz= toggles quiz loop, print status:
+- toggleQuiz= toggles quiz loop, print boolean value
 ##### PRINT TOGGLES: print to console, and enable/disable printing in event loop
 - h or help = show options
 - pChunk="summary of page chunk" print gpt summary of the last chunk of pages
@@ -81,11 +82,11 @@ if toggled on, start after step 1 in Event Loop
 - delAfter= delete stack of appended prompts
 - maxToken=change response length/max token count (default 2000, max = 4096 includes prompt)
 ##### LLM SUMMARY PROMPT MODIFICATION: change all summary llm queries going forward
-- beforeSummary= get user input, prepend to summarization prompt
-  - "" 
+- beforeSummary= prepend user input to summarization prompt
+  - "You are helping a student cram for a test" 
 - delBeforeSummary=delete stack of prepended prompts
-- afterSummary= append next user query input to all summary gpt requests
-  - "" 
+- afterSummary= append next user input to all summary gpt requests
+  - "...and make it light hearted and funny" 
 - delAfterSummary= delete stack of appended prompts
 - maxTokenSummary=change response length/max summary token count (default 2000, max = 4096 includes summary prompts)
 
@@ -96,12 +97,16 @@ if toggled on, start after step 1 in Event Loop
   - 
 - resumeFromLog
 
-## Options (): 
 
-## Options (database schema): 
+## Other Configuration: 
 see [initDB.mjs]() for database schema
+
 or
-sqlite3
+
+`sqlite3 bza.sq3`
+`.schema`
+
+
 
 ## Design Decisions
 pdf-extract introduces a bunch of binary dependencies relative to alternative libraries but we want those because they enable optical character recognition on the subset of pdfs that are just scans of images (and I am guessing they are fast hopefully).
@@ -149,6 +154,8 @@ then i saw this reddit post
 https://www.reddit.com/r/singularity/comments/11ho23y/first_post_in_reddit_mistakely_used_a_text_post/
 
 and a within a couple minutes (well, techincally, i had started working a bit the day before on a book2quiz concept), after some good ole reddit arguing, i started writing this
+
+[original link](https://github.com/NotBrianZach/gptbook2quiz)
 
 ## Pushdown Large Language Models
 
