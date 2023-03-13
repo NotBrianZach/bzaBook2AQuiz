@@ -58,21 +58,21 @@ if toggled on, start after step 1 in Event Loop
 - c="continue" to next pageChunk,
 - j="jump" to input pageNumber,
 - EX="EXit" exit program, saving logs
-### ASK user for input
+##### ASK user for input
 - r="repeat" ask user for input, then append to prompt and query gpt, 
 - RE="REstart" restart conversation w/only initial prompt and save to logs
 - REDT="REstart DesTructive" hard restart conversation w/only initial prompt
-#### EVENT LOOP TOGGLES
+##### EVENT LOOP TOGGLES
 - quiz= run quiz loop once
 - toggleQuiz= quiz loop (step 1.a. in Event Loop, prior to User Input, after summaries):
-#### PRINT TOGGLES: print to console, and enable/disable printing in event loop
+##### PRINT TOGGLES: print to console, and enable/disable printing in event loop
 - h or help = show options
 - chunk="summary of page chunk" print gpt summary of the last chunk of pages
 - roll="rolling summary" print gpt summary of everything up to this point (short term memory)
 - narrate= rewrite all output in the voice of a character
 - voiceOut= TODO "Voice output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
 - voiceIn= TODO "voice input"  use ?talon? to allow voice input
-### LLM PROMPT MODIFICATION: change all non-summary llm queries going forward
+##### LLM PROMPT MODIFICATION: change all non-summary llm queries going forward
 - before= get user input, prepend to conversation prompt
   - "tell a joke about the following text:" 
 - delBefore=delete stack of prepended prompts
@@ -80,7 +80,7 @@ if toggled on, start after step 1 in Event Loop
   - "...tell another joke about the above text that ties into the first joke" 
 - delAfter= delete stack of appended prompts
 - maxToken=change response length/max token count (default 2000, max = 4096 includes prompt)
-### LLM SUMMARY PROMPT MODIFICATION: change all summary llm queries going forward
+##### LLM SUMMARY PROMPT MODIFICATION: change all summary llm queries going forward
 - beforeSummary= get user input, prepend to summarization prompt
   - "" 
 - delBeforeSummary=delete stack of prepended prompts
