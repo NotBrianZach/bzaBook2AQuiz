@@ -45,9 +45,9 @@ export default async function getUserInput(curPageNum, gptPrompt, queryGPT) {
       query = await prompt(["query"]);
       gptResponse = queryGPT(`${gptPrompt}\n${query}`);
       console.log("gptResponse", gptResponse);
-      getUserInput(curPageNum, gptResponse, queryGPT);
+      getUserInput(curPageNum, `${gptPrompt}\n${query}\ngptResponse`, queryGPT);
       break;
-    case "R":
+    case "RE":
       query = await prompt(["query"]);
       gptResponse = queryGPT(`${gptPrompt}`);
       getUserInput(curPageNum, gptResponse, queryGPT);

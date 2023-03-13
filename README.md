@@ -56,19 +56,19 @@ if toggled on, start after step 1 in Event Loop
 
 ## User Input (default options):
 - c="continue" to next pageChunk,
-- j="jump" to input pageNumber,
+- jump="jump" to input pageNumber,
 - EX="EXit" exit program, saving logs
 ##### ASK user for input
-- r="repeat" ask user for input, then append to prompt and query gpt, 
+- r="repeat" ask user for input, append to prompt and query gpt, 
 - RE="REstart" restart conversation w/only initial prompt and save to logs
 - REDT="REstart DesTructive" hard restart conversation w/only initial prompt
-##### EVENT LOOP TOGGLES
+##### SUBLOOP COMMANDS
 - quiz= run quiz loop once
-- toggleQuiz= quiz loop (step 1.a. in Event Loop, prior to User Input, after summaries):
+- toggleQuiz= toggles quiz loop, print status:
 ##### PRINT TOGGLES: print to console, and enable/disable printing in event loop
 - h or help = show options
-- chunk="summary of page chunk" print gpt summary of the last chunk of pages
-- roll="rolling summary" print gpt summary of everything up to this point (short term memory)
+- pChunk="summary of page chunk" print gpt summary of the last chunk of pages
+- pRoll="rolling summary" print gpt summary of everything up to this point (short term memory)
 - narrate= rewrite all output in the voice of a character
 - voiceOut= TODO "Voice output" use ?[TTS](https://github.com/coqui-ai/TTS)? to generate voice to narrate gpt response & queries to user
 - voiceIn= TODO "voice input"  use ?talon? to allow voice input
@@ -90,6 +90,8 @@ if toggled on, start after step 1 in Event Loop
 - maxTokenSummary=change response length/max summary token count (default 2000, max = 4096 includes summary prompts)
 
 ## Command Line Meta Commands (bza)
+- read <bookName>
+
 - printLog
   - 
 - resumeFromLog
@@ -97,7 +99,9 @@ if toggled on, start after step 1 in Event Loop
 ## Options (): 
 
 ## Options (database schema): 
-
+see [initDB.mjs]() for database schema
+or
+sqlite3
 
 ## Design Decisions
 pdf-extract introduces a bunch of binary dependencies relative to alternative libraries but we want those because they enable optical character recognition on the subset of pdfs that are just scans of images (and I am guessing they are fast hopefully).

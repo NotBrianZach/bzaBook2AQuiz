@@ -22,53 +22,69 @@ const dbContexts = db.prepare(
 );
 dbContexts.run();
 const dbPDFs = db.prepare(
-  "create table if not exists pdfs (bTitle TEXT primary key, filepath text no null, isPrintPage boolean default false, readerExe text not null default 'mupdf', readerArgs not null default '-Y 2', isImage boolean)"
+  `create table if not exists pdfs (bTitle TEXT primary key,
+ filepath text not null,
+ isPrintPage boolean default false,
+ readerExe text not null default 'mupdf',
+ readerArgs not null default '-Y 2',
+ isImage boolean default false)`
 );
-dbPdfs.run();
+dbPDFS.run();
 const dbHTML = db.prepare(
-  "create table if not exists pdfs (bTitle TEXT primary key, filepath text not null, isPrintPage boolean default true, readerExe text, readerArgs, isImage boolean)"
+  `create table if not exists pdfs (bTitle TEXT primary key,
+ filepath text not null,
+ isPrintPage boolean default true,
+ readerExe text,
+ readerArgs text,
+ isImage boolean)`
 );
 dbHTML.run();
 const dbURL = db.prepare(
-  "create table if not exists pdfs (bTitle TEXT primary key, isPrintPage boolean default true, readerExe text, readerArgs, isImage boolean)"
+  `create table if not exists pdfs (bTitle TEXT primary key,
+ isPrintPage boolean default true,
+ readerExe text,
+ readerArgs text,
+ isImage boolean)`
 );
 dbURL.run();
 const dbLogging = db.prepare(
-  "create table if not exists logs (bTitle TEXT, pageNumber INTEGER not null default 0, pageChunk TEXT, pageChunkSummary TEXT, rollingSummary TEXT, conversation TEXT, chunkSize INTEGER not null, maxTokens INTEGER not null default 2000, narrator TEXT, read_tstamp TEXT primary key(read_tstamp))"
+  `create table if not exists logs (bTitle TEXT,
+ pageNumber INTEGER not null default 0,
+ pageChunk TEXT,
+ pageChunkSummary TEXT,
+ rollingSummary TEXT,
+ conversation TEXT,
+ chunkSize INTEGER not null,
+ maxTokens INTEGER not null default 2000,
+ narrator TEXT,
+ read_tstamp TEXT primary key(read_tstamp))`
 );
 dbLogging.run();
 
-// pageChunk: {},
-// pageChunkSummary: {},
-// rollingSummary: {},
-// quizzes: {
-//   "0-2": {
-//     questions: "",
-//     answers: "",
-//     readingList: {}
-//   }
-// }
-
+const dbExamplePDFBook = db.prepare(
+  `insert into`
+  //   Frankenstein: {
+  //     pageNumber: 0,
+  //     articleType: "book",
+  //     chunkSize: 2,
+  //     narrator: "Mr. T",
+  //     title: "Frankenstein",
+  //     synopsis:
+  //       "A scientist, Victor Von Frankenstein creates life by infusing corpses with lightning. His Misshapen creature seeks the affection of his father and failing that, the creation of a bride, but Frankenstein refuses leading to a climactic chase across the world as the creature rebels against his creator.",
+  //     isPrintPage: true,
+  //     isPrintChunkSummary: true,
+  //     isPrintRollingSummary: true,
+  //     quiz: false,
+  //     path: "./Frankenstein.pdf",
+  //     url: "",
+  //     max_tokens: 2000,
+  //     executable: "xpdf",
+  //     exeArguments: "-z 200",
+  //     prependContext: [""],
+  //     appendContext: [""]
+);
+dbExamplePDFBook.run();
 // pdf: {
-//   Frankenstein: {
-//     pageNumber: 0,
-//     articleType: "book",
-//     chunkSize: 2,
-//     narrator: "Mr. T",
-//     title: "Frankenstein",
-//     synopsis:
-//       "A scientist, Victor Von Frankenstein creates life by infusing corpses with lightning. His Misshapen creature seeks the affection of his father and failing that, the creation of a bride, but Frankenstein refuses leading to a climactic chase across the world as the creature rebels against his creator.",
-//     isPrintPage: true,
-//     isPrintChunkSummary: true,
-//     isPrintRollingSummary: true,
-//     quiz: false,
-//     path: "./Frankenstein.pdf",
-//     url: "",
-//     max_tokens: 2000,
-//     executable: "xpdf",
-//     exeArguments: "-z 200",
-//     prependContext: [""],
-//     appendContext: [""]
 //   },
 //   "World Models": {
 //     pageNumber: 0,
