@@ -1,4 +1,5 @@
-# Book piZzA: A GPT-Powered Conversational Read Eval Print Loop and Bookmarks Manager for Books, Articles & Webpages (WIP)
+# * this repo has moved to  https://github.com/NotBrianZach/bza
+  Book piZzA: A GPT-Powered Conversational Read Eval Print Loop and Bookmarks Manager for Books, Articles & Webpages (WIP)
 
 Interactive books. Books sliced up like pizza. Book pizza. bza.
 
